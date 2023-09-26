@@ -1,0 +1,26 @@
+  location /open-data/api/ {
+
+    proxy_pass http://postgrest/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_max_temp_file_size 0;
+  }
+
+	location /open-data/staging/api/ {
+			
+	  proxy_pass http://staging-api/;  
+    proxy_http_version 1.1;  
+    proxy_set_header Upgrade $http_upgrade;  
+    proxy_set_header Connection 'upgrade';
+	}
+
+	location /publieke-data/ {
+
+	  proxy_pass http://postgrest-public/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+
+	}
+	

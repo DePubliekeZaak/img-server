@@ -1,0 +1,140 @@
+version: "3.7"
+services:
+
+  nginx1:
+    image: custom_nginx
+    container_name: nginx1
+    build:
+      context: ..
+      dockerfile: ./docker/nginx.Dockerfile
+    restart: always
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - /var/log/nginx:/var/log/nginx
+      - /var/www/html:/var/www/html
+    environment:
+      - DOMAIN=${DOMAIN}
+    command: /bin/sh -c "envsubst < /etc/nginx/conf.d/_server.conf.template > /etc/nginx/conf.d/_server.conf && nginx -g 'daemon off;'"
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - img
+
+
+  db1:
+    image: postgres:15
+    container_name: db1
+    restart: always
+    environment:
+      POSTGRES_DB: img
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - files:/tmp
+    networks:
+      - img
+
+  pgadmin1:
+    image: dpage/pgadmin4:6
+    container_name: pgadmin1
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_LISTEN_PORT: 8080  
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - img
+
+  server1:
+    image: postgrest/postgrest:v10.1.1
+    container_name: server1
+    links:
+      - "db1:db1"
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${LIVE}
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    depends_on:
+      - db1
+    networks:
+      - img
+
+  staging-server1:
+    image: postgrest/postgrest:v10.1.1
+    container_name: staging-server1
+    links:
+      - "db1:db1"
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${STAGING}
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    depends_on:
+      - db1
+    networks:
+      - img
+
+  public-server1:
+    image: postgrest/postgrest:v10.1.1
+    container_name: public-server1
+    links:
+      - "db1:db1"
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${LIVE}
+      PGRST_DB_SCHEMA: publiek
+      PGRST_DB_ANON_ROLE: web_anon
+    depends_on:
+      - db1
+    networks:
+      - img
+
+  swagger1:
+    image: swaggerapi/swagger-ui
+    container_name: swagger1
+    expose:
+      - "8080"
+    depends_on:
+      - server1
+    links:
+      - server1:server
+    environment:
+      SWAGGER_JSON: /json/swagger.json
+    volumes:
+      - ../swagger_json:/json
+    networks:
+      - img
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    networks:
+      - img
+
+  node:
+    image: custom_node
+    container_name: node
+    build:
+      context: ..
+      dockerfile: ./docker/node.Dockerfile
+    depends_on:
+      - redis
+    ports: 
+      - "3009:3009"
+    volumes:
+      - files:/tmp
+    networks:
+      - img
+
+volumes:
+  db-data:
+  pgadmin-data:
+  nginx:
+  letsencrypt:
+  files:
+
+networks:
+  img: null

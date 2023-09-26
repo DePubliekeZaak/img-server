@@ -1,0 +1,35 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "npx nodemon src/app.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "deploy": "cd dist && git add . && git commit -am 'automated' && git push img master && cd .."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.14.1",
+    "@types/pg": "^8.6.6",
+    "nodemon": "^2.0.20",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.278.0",
+    "@endodata/pg-dump-restore-node-wrapper": "^0.0.3",
+    "child-process": "^1.0.2",
+    "child-process-promise": "^2.2.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.17.1",
+    "fs": "^0.0.1-security",
+    "node-xlsx": "^0.21.0",
+    "pg": "^8.9.0",
+    "redis": "^4.6.4",
+    "slugify": "^1.6.6"
+  }
+}

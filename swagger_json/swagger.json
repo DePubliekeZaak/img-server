@@ -1,0 +1,211 @@
+{"swagger":"2.0","info":{"version":"0.0.1",
+    
+    "title":"Publieke data van het Instituut Mijnbouwschade Groningen",
+    "description":
+    
+        "<p>Bijgaande data worden gegenereerd door het IMG, op basis van wekelijkse updates vanuit de administratiesystemen. Het gaat om geaggregeerde data ten behoeve van voortgangsrapportages en inzichtverwerving, waarbij een abstractieeniveau is gekozen dat de privacy borgt van schademelders. Zo is er geen informatie beschikbaar op adresniveau. Dezelfde data vormt ook de basis van het <a href='https://www.schadedoormijnbouw.nl/dashboard' target='_blank'>online dashboard</a> dat het IMG biedt op zijn website en de wekelijkse nieuwsupdates op die website. Het is niet uit te sluiten dat door de tijd heen data moet worden gecorrigeerd, bijvoorbeeld vanwege wijzigingen in het administratiesysteem, registratiefouten en verandering van aanpak van schadeafhandeling waardoor de onderliggende definities van de data wijzigen. Ook externe factoren kunnen wijzigingen veroorzaken, zoals herindeling van gemeentegrenzen.<p/><h3>Totalen en weektotalen</h3><p> De data wordt wekelijks geupdate als nieuwe totaalaantal sinds de start van de TCMG op 19 maart 2018, voor zover de data beschikbaar is sinds dat moment. De update vindt plaats op dinsdag en beslaat dan het totaalaantal tot de voorgaande maandag 9.00 uur. Door het verschil te berekenen tussen het nieuwe totaal na een update afgezet tegen het vorige totaal, is bekend wat de ontwikkeling is geweest in de voorgaande week van maandag 9.00 uur tot maandag 9.00 uur. Als bijvoorbeeld op dinsdag een totaalaantal schademelding van 100.000 wordt geregistreerd en de week daarvoor een totaalaantal van 99.000 schademeldingen bekend was, dan zijn er van maandag tot maandag 1.000 schademeldingen binnengekomen.</p><p>Vragen? Mail naar <a href='mailto:persvoorlichting@schadedoormijnbouw.nl'>persvoorlichting@schadedoormijnbouw.nl</a>."
+    
+    },
+
+    "host":"img.publikaan.nl/publieke-data",
+    "basePath":"/",
+    "schemes":["https"],
+    "consumes":["application/json","application/vnd.pgrst.object+json","text/csv"],
+    "produces":["application/json","application/vnd.pgrst.object+json","text/csv"],
+    "contact": {
+        "email": "apiteam@swagger.io"
+      },
+    
+    
+    "paths":{
+
+        "/fysieke_schade?gemeente=eq.all":{
+            "get":{"tags":["Fysieke schade"],"parameters":[],
+                "description": "Deze data bevatten de totalen voor alle gemeenten, inclusief dossiers zonder gemeente",
+                "responses":{
+                    "200":{"schema":{"items":{"$ref":"#/definitions/fysieke_schade"},"type":"array"},"description":"OK"}}}
+        },
+        
+            
+        "/fysieke_schade?gemeente=eq.{gemeente}":{
+            "get":{
+                "description": "Data voor een individuele gemeente met historie. Let op! De gemeente is bepaald aan de hand van het correspondentieadres, niet het adres waar mogelijke schade is geconstateerd. Tip! Voor complete data voor iedere gemeente inclusief historie in json format kun je de volgende url openen. <a target='_blank' href='https://img.publikaan.nl/publieke-data/fysieke_schade'>https://img.publikaan.nl/publieke-data/fysieke_schade</a>",
+                "tags":["Fysieke schade: voor individuele gemeenten"],
+                "parameters":[{
+                "name": "gemeente",
+                "default": "eemsdelta",
+                "in": "path",
+                "description": "Gemeentenaam",
+                "required": true,
+                "type": "string",
+                "format": "string"
+              }],
+            
+                "responses":{
+                    "200":{"schema":{"items":{"$ref":"#/definitions/fysieke_schade"},"type":"array"},"description":"OK"}}}
+        },
+
+        "/fysieke_schade?limit=61&order=datum.desc,gemeente.asc":{
+            "get":{
+                "description": "Data van het laatste publicatiemoment voor iedere individuele gemeente. Let op! De gemeente is bepaald aan de hand van het correspondentieadres, niet het adres waar mogelijke schade is geconstateerd. Tip! Voor complete data voor iedere gemeente inclusief historie in json format kun je de volgende url openen. <a target='_blank' href='https://img.publikaan.nl/publieke-data/fysieke_schade'>https://img.publikaan.nl/publieke-data/fysieke_schade</a> ",
+                "tags":["Fysieke schade: meest recente data voor alle individuele gemeenten"],
+                "parameters":[],
+            
+                "responses":{
+                    "200":{"schema":{"items":{"$ref":"#/definitions/fysieke_schade"},"type":"array"},"description":"OK"}}}
+        },
+            
+        "/immateriele_schade":{
+            "get":{"tags":["Immateriele schade"],"parameters":[],
+                
+                "responses":{
+                    "200":{"schema":{"items":{"$ref":"#/definitions/immateriele_schade"},"type":"array"},"description":"OK"}}}
+        },
+            
+        "/waardedaling":{
+            "get":{"tags":["Waardedaling van woningen"],"parameters":[],
+                
+                "responses":{
+                  
+                    "200":{"schema":{"items":{"$ref":"#/definitions/waardedaling"},"type":"array"},"description":"OK"}}}
+
+        },
+
+        "/acuut_onveilige_situaties":{
+            "get":{"tags":["Acuut onveilige situaties (AOS)"],"parameters":[],
+                
+                "responses":{
+                    "200":{"schema":{"items":{"$ref":"#/definitions/acuut_onveilige_situaties"},"type":"array"},"description":"OK"}}}
+        }
+    },
+
+   
+            
+            
+    "definitions":{
+        
+        "fysieke_schade":{
+            "type":"object",
+            "properties" : {
+                "meldingen_binnengekomen" : {
+                    "type" : "integer",
+                    "description" : "Aantal schademeldingen binnengekomen sinds 19 maart 2018 bij het IMG (en voorloper TCMG). Een schademelding wordt ook wel een aanvraag tot vergoeding van schade genoemd. Het betreft hier ook de 13.472 schademeldingen die waren ingediend bij het Centrum Veilig Wonen tussen 31 maart 2017 en 19 maart 2018, bij de start van de TCMG. Het betrof schademeldingen die voor het overgrote deel niet waren afgehandeld. Op een adres kunnen meerdere schademeldingen zijn gedaan. Het aantal schademeldingen is dus niet gelijk aan het aantal adressen met gemelde schade."
+                },
+                "meldingen_in_behandeling" : {
+                    "type": "integer",
+                    "description": "Aantal schademeldingen dat nog in behandeling is en waarover dus nog geen besluit is genomen."
+                },
+                "meldingen_afgehandeld" : {
+                    "type": "integer",
+                    "description": "Aantal schademeldingen dat is afgehandeld. Voor het overgrote deel gebeurt dat door een besluit te nemen over de schademelding (de aanvraag tot vergoeding). In een klein aantal situaties wordt de schademelding nog voor een besluit wordt genomen door de schademelder ingetrokken. Soms kan ook met een enkel besluit meerdere schademeldingen tegelijk op een adres worden afgehandeld. "
+                },
+                "besluiten" : {
+                    "type": "integer",
+                    "description": "Het aantal besluiten dat is genomen naar aanleiding van schademeldingen (aanvragen tot vergoeding van schade). Met een enkel besluit kunnen soms meerdere schademeldingen voor een adres tegelijk worden afgehandeld. Het totaalaantal besluiten is daarom altijd lager dan het totaalaantal afgehandelde schademeldingen. Het totaalaantal besluiten is eveneens niet gelijk aan het totaalaantal adressen waar schade is gemeld. Er kan immers een nieuwe beving plaatsvinden waarvoor opnieuw schade wordt gemeld, nadat er al eerder schade was afgehandeld."
+                },
+                "besluiten_met_toekenning" : {
+                    "type": "integer",
+                    "description": "Het aantal besluiten waarbij sprake is van toekenning van een schadevergoeding. In bijna alle situaties is er sprake van meerdere schades die in een pand worden aangetroffen. In meerderheid van de besluiten wordt daarbij niet alle aangetroffen schade als mijnbouwschade beoordeeld, maar een deel ervan. Het betreft hier ook besluiten op basis van afhandeling via een vaste vergoeding. In dat geval wordt er geen schadebeoordeling gedaan maar een vast bedrag toegekend."
+                },
+                "besluiten_met_afwijzing" : {
+                    "type": "integer",
+                    "description": "Het aantal besluiten waarbij sprake is van afwijzing van een schadevergoeding. De afwijzing kan meerdere redenen. Op het betreffende adres met schade is het wettelijk bewijsvermoeden niet van toepassing, het IMG niet bevoegd om schade af te handelen of zijn alle aangetroffen schades die als mijnbouwschade beoordeeld door een onafhankelijke deskundige. In geval van een afwijzing van een aanvraag van een vaste vergoeding voldoet de aanvrager niet aan een van de voorwaarden."
+                },
+                "totale_schadevergoeding" : {
+                    "type": "integer",
+                    "description": "Het totaalbedrag in euro dat via besluiten van het IMG aan vergoeding is toegekend voor herstel van fysieke schade en alle materiële gevolgschade. Het betreft hier daarmee ook de wettelijke rente, bijkomende kosten en overlastvergoeding."
+                },
+                "minder_dan_half_jaar_in_procedure" : {
+                    "type": "integer",
+                    "description": "Het aantal schademeldingen dat minder dan een half jaar geleden is ingediend"
+                },
+                "tussen_half_jaar_en_jaar_in_procedure" : {
+                    "type": "integer",
+                    "description": "Het aantal schademeldingen dat tussen een half jaar en een jaar geleden is ingediend."
+                },
+                "tussen_jaar_en_twee_jaar_in_procedure" : {
+                    "type": "integer",
+                    "description": "Het aantal schademeldingen dat tussen een jaar en twee jaar geleden is ingediend."
+                },
+                "langer_dan_twee_jaar_in_procedure" : {
+                    "type": "integer",
+                    "description": "Het aantal schademeldingen dat langer dan twee jaar geleden is ingediend."
+                }
+            }
+        },
+        "immateriele_schade":{
+            "type":"object",
+            "properties" : {
+                "meldingen_binnengekomen" : {
+                    "type" : "integer",
+                    "description" : "Het aantal meldingen van immateriële schade waarvoor een vergoeding wordt aangevraagd voor een persoon. Per adres kunnen meerdere personen een melding doen en deze worden, vanwege het hoogstpersoonlijke karakter van deze vorm van schade, ook per persoon afgehandeld. De regeling is in november 2021 gefaseerd gestart voor volwassenen,"
+                },
+                "besluiten" : {
+                    "type": "integer",
+                    "description": "Het aantal meldingen van immateriële schade waarvoor een vergoeding wordt aangevraagd en die zijn afgehandeld met een besluit. Het betreft altijd een melding (een aanvraag) per persoon en daarmee ook een besluit voor een persoon.  De regeling is in november 2021 gefaseerd gestart voor volwassenen."
+                },
+                "vergoeding_toegekend" : {
+                    "type": "integer",
+                    "description": "Het aantal besluiten over meldingen van immateriële schade waarbij besloten is tot toekenning van een vergoeding voor de betreffende persoon. Binnen een huishouden kan er sprake zijn van vergoedingen van verschillende omvang vanwege het hoogstpersoonlijke karakter van deze vorm van schade. De regeling is in november 2021 gefaseerd gestart voor volwassenen."
+                },
+                "vergoeding_afgewezen" : {
+                    "type": "integer",
+                    "description": "Het aantal besluiten over meldingen van immateriële schade waarbij besloten is tot het niet toekennen van een vergoeding voor een persoon. Op een adres kan het vanwege het hoogstpersoonlijke karakter van deze vorm van schade voorkomen dat de ene persoon wel een vergoeding ontvangt en de andere persoon niet. De regeling is in november 2021 gefaseerd gestart voor volwassenen."
+                },
+                "vergoeding_totaal_toegekend" : {
+                    "type": "integer",
+                    "description": "De totale schadevergoeding in euro die is toegekend voor immateriële schade. Bij circa 99 procent van de besluiten gaat het om een vooraf vastgesteld bedrag van 1.500, 3.000 of 5.000 euro per persoon. Bij circa 1 procent van alle meldingen volgt een maatwerkprocedure waarbij het schadebedrag meer kan variëren."
+                }
+            }
+        },
+        "waardedaling":{
+            "type":"object",
+            "properties" : {
+                "meldingen_binnengekomen" : {
+                    "type" : "integer",
+                    "description" : "Het aantal meldingen (aanvragen tot vergoeding) voor schade door waardedaling bij woningen. Per woning kunnen er soms meerdere meldingen worden gedaan omdat er sprake kan zijn van meerdere eigenaren die elk voor hun eigenaarsdeel een melding doen. De regeling bestaat sinds september 2020."
+                },
+                "meldingen afgehandeld" : {
+                    "type": "integer",
+                    "description": "Het aantal meldingen (aanvragen tot vergoeding) voor schade door waardedaling bij woningen die zijn afgehandeld door een besluit over de aanvraag. Per woning kunnen er soms meerdere meldingen worden gedaan omdat er sprake kan zijn van meerdere eigenaren die elk voor hun eigenaarsdeel een melding doen. Er kunnen dan ook alleen al om die reden sprake zijn van meerdere besluiten. De regeling bestaat sinds september 2020."
+                },
+                "vergoeding_toegekend" : {
+                    "type": "integer",
+                    "description": "Het aantal meldingen (aanvragen tot vergoeding) voor schade door waardedaling bij woningen die zijn afgehandeld door een besluit over de aanvraag waarbij sprake is van toekenning van een vergoeding. Per woning kunnen er soms meerdere meldingen worden gedaan omdat er sprake kan zijn van meerdere eigenaren die elk voor hun eigenaarsdeel een melding doen. Er kunnen dan ook alleen al om die reden sprake zijn van meerdere besluiten met toekenning van een vergoeding. De regeling bestaat sinds september 2020."
+                },
+                "vergoeding_afgewezen" : {
+                    "type": "integer",
+                    "description": "Het aantal meldingen (aanvragen tot vergoeding) voor schade door waardedaling bij woningen die zijn afgehandeld door een besluit over de aanvraag waarbij sprake is van afwijzing van een vergoeding. Per woning kunnen er soms meerdere meldingen worden gedaan omdat er sprake kan zijn van meerdere eigenaren die elk voor hun eigenaarsdeel een melding doen. Er kunnen dan ook alleen al om die reden sprake zijn van meerdere besluiten met afwijzing van een vergoeding. Reden van afwijzing zijn bijvoorbeeld: de woning is gelegen buiten het gebied waarvoor waardedaling is vastgesteld, de aanvrager bleek geen rechthebbende of er was al eerder vergoeding toegekend via andere instanties pf procedures. De regeling bestaat sinds september 2020."
+                },
+                "totaal_vergoeding_toegekend": {
+                    "type": "integer",
+                    "description": "Totale vergoeding in euro toegekend voor waardedaling van woningen. De regeling bestaat sinds september 2020."
+                }
+            }
+        },
+        "acuut_onveilige_situaties":{
+            "type":"object",
+            "properties" : {
+                "meldingen_mogelijk_acuut_onveilige_situatie_aos" :{
+                    "type" : "integer",
+                    "description" : "Het totaalaantal meldingen van een mogelijk acuut onveilige situatie (AOS). Na een AOS-melding volgt, indien deze in behandeling wordt genomen, doorgaans een veiligheidsinspectie. Bij een dergelijke inspectie wordt beoordeeld of er sprake is van acute onveiligheid door de fysieke staat waarin het gebouw zich bevindt. Er wordt geen beoordeling gedaan van de schadeoorzaak. Een AOS-melding staat ook verder los van de afhandeling van schademeldingen (aanvragen tot vergoeding van schade) en de procedure is kosteloos voor de betrokkene."
+                },
+                "maatregelen_nodig_na_aos_inspectie" :{
+                    "type" : "integer",
+                    "description" : "Als na een AOS-melding deze in behandeling wordt genomen, volgt een veiligheidsinspectie. Als deze uitwijst dat er sprake is van acute onveiligheid vanwege de fysieke staat van het gebouw, worden in overleg met de woningeigenaar veiligheidsmaatregelen getroffen. Het cijfer geeft aan hoe vaak dat na een AOS-melding nodig is geweest."
+                }
+            }
+            
+        }
+        },
+        
+        "parameters":{"preferParams":{"name":"Prefer","description":"Preference","required":false,"in":"header","type":"string","enum":["params=single-object"]},"preferReturn":{"name":"Prefer","description":"Preference","required":false,"in":"header","type":"string","enum":["return=representation","return=minimal","return=none"]},"preferCount":{"name":"Prefer","description":"Preference","required":false,"in":"header","type":"string","enum":["count=none"]},"select":{"name":"select","description":"Filtering Columns","required":false,"in":"query","type":"string"},"on_conflict":{"name":"on_conflict","description":"On Conflict","required":false,"in":"query","type":"string"},"order":{"name":"order","description":"Ordering","required":false,"in":"query","type":"string"},"range":{"name":"Range","description":"Limiting and Pagination","required":false,"in":"header","type":"string"},"rangeUnit":{"name":"Range-Unit","description":"Limiting and Pagination","required":false,"default":"items","in":"header","type":"string"},"offset":{"name":"offset","description":"Limiting and Pagination","required":false,"in":"query","type":"string"},"limit":{"name":"limit","description":"Limiting and Pagination","required":false,"in":"query","type":"string"},
+        
+        
+        
+    "body.acuut_onveilige_situaties":{"name":"acuut_onveilige_situaties","description":"waar komt dit te staan?","required":false,"schema":{"$ref":"#/definitions/acuut_onveilige_situaties"},"in":"body"},
+    "body.fysieke_schade":{"name":"fysieke_schade","description":"fysieke_schade","required":false,"schema":{"$ref":"#/definitions/fysieke_schade"},"in":"body"},
+    "body.immateriele_schade":{"name":"immateriele_schade","description":"immateriele_schade","required":false,"schema":{"$ref":"#/definitions/immateriele_schade"},"in":"body"},
+    "body.waardedaling":{"name":"waardedaling","description":"waardedaling","required":false,"schema":{"$ref":"#/definitions/waardedaling"},"in":"body"}},
+    
+    "externalDocs":{"url":"https://postgrest.org/en/v7.0/api.html","description":"PostgREST Documentation"}}

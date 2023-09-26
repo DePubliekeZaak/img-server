@@ -1,0 +1,8 @@
+	location /pgadmin4/ {
+        
+		proxy_pass http://pgadmin/;
+		proxy_set_header X-Script-Name /pgadmin4;
+		proxy_set_header X-Scheme $scheme;
+		proxy_set_header Host $host;
+		proxy_redirect off; 
+	}
