@@ -7,32 +7,33 @@
 # }
 
 server {
-#        listen 80 default;
+        listen 80 default;
        root /var/www/html;
        index index.html;
        server_name img.${DOMAIN}; 
 
        include /etc/nginx/conf.d/img/*locations;
 
-       listen 443 ssl; # managed by Certbot
-       ssl_certificate /etc/letsencrypt/live/graphs.${DOMAIN}/fullchain.pem; # managed by Certbot
-       ssl_certificate_key /etc/letsencrypt/live/graphs.${DOMAIN}/privkey.pem; # managed by Certbot
- #      include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+#       listen 443 ssl; # managed by Certbot
+#      ssl_certificate /etc/letsencrypt/live/graphs.${DOMAIN}/fullchain.pem; # managed by Certbot
+#      ssl_certificate_key /etc/letsencrypt/live/graphs.${DOMAIN}/privkey.pem; # managed by Certbot
+#      include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+#    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
 
 
 # serveert de bundle.js en topojson files voor het live dashboard
 # domein en paden (redirects) zijn relevant voor integratie met cms 
 server {
+        listen 80 default;
         root /var/www/html;
         server_name graphs.${DOMAIN};
 
 	include /etc/nginx/conf.d/graphs/*.locations;
 
-        listen 443 ssl; # managed by Certbot
-        ssl_certificate /etc/letsencrypt/live/graphs.${DOMAIN}/fullchain.pem; # managed by Certbot
-        ssl_certificate_key /etc/letsencrypt/live/graphs.${DOMAIN}/privkey.pem; # managed by Certbot
+#        listen 443 ssl; # managed by Certbot
+#        ssl_certificate /etc/letsencrypt/live/graphs.${DOMAIN}/fullchain.pem; # managed by Certbot
+#        ssl_certificate_key /etc/letsencrypt/live/graphs.${DOMAIN}/privkey.pem; # managed by Certbot
 #        include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
-        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+#        ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 }
