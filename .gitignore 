@@ -1,0 +1,5 @@
+docker/.env
+node/.env
+node/node_modules/
+node/package-lock.json
+nginx/conf.d/_server.conf.template
