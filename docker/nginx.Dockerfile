@@ -6,6 +6,6 @@ RUN mkdir /etc/letsencrypt
 
 
 WORKDIR /
-COPY nginx/conf.d /etc/nginx/conf.d/
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY ../nginx/conf.d /etc/nginx/conf.d/
+COPY ../nginx/nginx.conf /etc/nginx/nginx.conf
 
