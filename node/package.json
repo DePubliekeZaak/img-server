@@ -5,7 +5,6 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "npx nodemon src/app.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc",
     "deploy": "cd dist && git add . && git commit -am 'automated' && git push img master && cd .."
   },
