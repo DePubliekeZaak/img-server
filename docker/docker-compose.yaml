@@ -78,6 +78,20 @@ services:
     networks:
       - img
 
+  dev-server1:
+    image: postgrest/postgrest:v10.1.1
+    container_name: dev-server1
+    links:
+      - "db1:db1"
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${DEV}
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    depends_on:
+      - db1
+    networks:
+      - img
+
   public-server1:
     image: postgrest/postgrest:v10.1.1
     container_name: public-server1
