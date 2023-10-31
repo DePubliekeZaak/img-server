@@ -76,6 +76,7 @@ export class DbController implements IDbController {
         return {
             'LIVE' : await this.redis.read('live_db'),
             'STAGING' : await this.redis.read('staging_db'),
+            'DEV' : await this.redis.read('dev_db'),
             'NEW' : await this.redis.read('new_db'),
         }
     }
