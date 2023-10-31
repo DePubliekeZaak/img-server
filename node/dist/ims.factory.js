@@ -7,7 +7,7 @@ exports.parseIms = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const date_factory_1 = require("./date.factory");
 const rowByDesc = (rows, desc) => {
-    const row = rows.find(r => r[0] == desc);
+    const row = rows.find(r => r[1] == desc);
     if (row === undefined) {
         console.log("error at " + desc);
     }

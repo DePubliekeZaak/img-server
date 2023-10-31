@@ -7,7 +7,7 @@ exports.parseWd = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const date_factory_1 = require("./date.factory");
 const rowByDesc = (rows, desc) => {
-    return rows.filter(r => r[0] == desc);
+    return rows.filter(r => r[1] == desc);
 };
 const removePercentage = (s) => {
     s = (parseFloat(s) * 100).toString();
