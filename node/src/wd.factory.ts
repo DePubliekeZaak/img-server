@@ -3,6 +3,7 @@ import { formatDate } from './date.factory';
 import { stripCurrency } from './format.factory';
 
 const rowByDesc = (rows: any[], desc: string) =>  {
+
     return rows.filter( r => r[0] == desc);
 }
 
