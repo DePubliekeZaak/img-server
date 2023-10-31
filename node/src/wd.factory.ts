@@ -4,7 +4,7 @@ import { stripCurrency } from './format.factory';
 
 const rowByDesc = (rows: any[], desc: string) =>  {
 
-    return rows.filter( r => r[0] == desc);
+    return rows.filter( r => r[1] == desc);
 }
 
 const removePercentage = (s: string) => {

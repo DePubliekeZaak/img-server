@@ -1,6 +1,6 @@
   location /open-data/api/ {
 
-    proxy_pass http://postgrest/;
+    proxy_pass http://live-api/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';
@@ -15,9 +15,18 @@
     proxy_set_header Connection 'upgrade';
 	}
 
+  location /open-data/dev/api/ {
+			
+	  proxy_pass http://dev-api/;  
+    proxy_http_version 1.1;  
+    proxy_set_header Upgrade $http_upgrade;  
+    proxy_set_header Connection 'upgrade';
+	}
+
+
 	location /publieke-data/ {
 
-	  proxy_pass http://postgrest-public/;
+	  proxy_pass http://public-api/;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection 'upgrade';

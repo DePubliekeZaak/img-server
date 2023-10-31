@@ -5,7 +5,7 @@ import { stripCurrency } from './format.factory';
 
 const rowByDesc = (rows: any[], desc: string) =>  {
 
-    const row = rows.find( r => r[0] == desc);
+    const row = rows.find( r => r[1] == desc);
 
     if(row === undefined) {
         console.log("error at " + desc)
