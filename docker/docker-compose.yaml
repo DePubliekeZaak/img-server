@@ -21,7 +21,6 @@ services:
     networks:
       - img
 
-
   db1:
     image: postgres:15
     container_name: db1

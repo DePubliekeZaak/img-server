@@ -19,9 +19,11 @@ const parseWd = (data, date, week) => {
         datum: (0, date_factory_1.formatDate)(date),
         gemeente: 'all'
     };
+    console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
     const column = rows[0].indexOf("Week " + (week).toString());
+    console.log(column);
     object["aanvragen"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[1][column]);
     object["aanvragers"] = parseInt(rowByDesc(rows, 'Unieke aanvragers')[0][column]);
     object["afgehandeld"] = parseInt(rowByDesc(rows, 'Totaal beschikkingen')[0][column]);

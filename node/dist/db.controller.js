@@ -75,6 +75,7 @@ class DbController {
             return {
                 'LIVE': yield this.redis.read('live_db'),
                 'STAGING': yield this.redis.read('staging_db'),
+                'DEV': yield this.redis.read('dev_db'),
                 'NEW': yield this.redis.read('new_db'),
             };
         });
