@@ -23,7 +23,7 @@ export const parseWd = (data: any, date: Date, week: number) => {
         gemeente: 'all'
     };
 
-    console.log(week);
+    // console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
     const column = rows[2].indexOf("Week " + (week).toString());

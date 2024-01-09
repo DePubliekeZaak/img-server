@@ -19,7 +19,7 @@ const parseWd = (data, date, week) => {
         datum: (0, date_factory_1.formatDate)(date),
         gemeente: 'all'
     };
-    console.log(week);
+    // console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
     const column = rows[2].indexOf("Week " + (week).toString());
