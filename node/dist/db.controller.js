@@ -62,9 +62,14 @@ class DbController {
     }
     backup(db, name) {
         return __awaiter(this, void 0, void 0, function* () {
-            const path = yield this.postgres.dump(db, name);
-            const fileStream = yield fs_1.default.createReadStream(path);
-            const res = yield this.bucket.writeFile(fileStream, name, db);
+            try {
+                const path = yield this.postgres.dump(db, name);
+                const fileStream = yield fs_1.default.createReadStream(path);
+                const res = yield this.bucket.writeFile(fileStream, name, db);
+            }
+            catch (err) {
+                console.log(err);
+            }
             return {
                 msg: 'backup for ' + name + "-" + db
             };

@@ -38,7 +38,7 @@ export class DataController implements IDataController {
     
         try {
 
-            const year = 2023;
+            const year = 2024;
             let data: any;
             let date: Date;
             console.log('starting data entry for ' + topic);

@@ -22,8 +22,8 @@ const parseWd = (data, date, week) => {
     console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
-    const column = rows[0].indexOf("Week " + (week).toString());
-    console.log(column);
+    const column = rows[2].indexOf("Week " + (week).toString());
+    // console.log(rows);
     object["aanvragen"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[1][column]);
     object["aanvragers"] = parseInt(rowByDesc(rows, 'Unieke aanvragers')[0][column]);
     object["afgehandeld"] = parseInt(rowByDesc(rows, 'Totaal beschikkingen')[0][column]);
@@ -34,7 +34,7 @@ const parseWd = (data, date, week) => {
     object["bezwaren_afgehandeld"] = parseInt(rowByDesc(rows, 'Afgehandelde bezwaren')[0][column]);
     object["bezwaren_openstaand"] = parseInt(rowByDesc(rows, 'Niet-afgehandelde bezwaren (totaal)')[0][column]);
     object["bezwaarpercentage"] = removePercentage(rowByDesc(rows, 'Ingediende bezwaren')[1][column]);
-    object["bezwaren_in_afwachting"] = parseInt(rowByDesc(rows, 'Niet-afgehandelde bezwaren (in afwachting bezwaarschrift)')[0][column]);
+    object["bezwaren_in_afwachting"] = parseInt(rowByDesc(rows, 'Niet-afgehandelde bezwaren (totaal)')[0][column]);
     object["bezwaren_ingediend"] = parseInt(rowByDesc(rows, 'Ingediende bezwaren')[0][column]);
     console.log(object);
     return object;

@@ -31,7 +31,7 @@ export const parseIms = (data: any, date: Date, week: number) => {
     };
 
     const rows = data[0].data;
-    const column = rows[0].indexOf("Week " + (week).toString())
+    const column = rows[2].indexOf("Week " + (week).toString())
 
     // console.log(rows);
     console.log(column);

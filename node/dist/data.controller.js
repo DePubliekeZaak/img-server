@@ -37,7 +37,7 @@ class DataController {
     entry(week, topic, db) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const year = 2023;
+                const year = 2024;
                 let data;
                 let date;
                 console.log('starting data entry for ' + topic);

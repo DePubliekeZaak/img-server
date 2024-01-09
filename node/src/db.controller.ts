@@ -62,9 +62,16 @@ export class DbController implements IDbController {
 
     async backup(db: string, name: string) {
 
-        const path = await this.postgres.dump(db,name);
-        const fileStream = await fs.createReadStream(path);
-        const res = await this.bucket.writeFile(fileStream, name, db);
+        try {
+
+            const path = await this.postgres.dump(db,name);
+            const fileStream = await fs.createReadStream(path);
+            const res = await this.bucket.writeFile(fileStream, name, db);
+
+        } catch(err) {
+
+            console.log(err)
+        }
 
         return {
             msg : 'backup for ' + name + "-" + db 

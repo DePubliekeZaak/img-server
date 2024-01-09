@@ -24,7 +24,7 @@ const parseIms = (data, date, week) => {
         gemeente: 'all'
     };
     const rows = data[0].data;
-    const column = rows[0].indexOf("Week " + (week).toString());
+    const column = rows[2].indexOf("Week " + (week).toString());
     // console.log(rows);
     console.log(column);
     object["pc4"] = "-";
