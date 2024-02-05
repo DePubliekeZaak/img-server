@@ -17,6 +17,8 @@
 
 Overige containers:
 
+|||
+|---|---|
 | db1 | postgres databases | 
 | pgadmin1 | webinterface for postgres |
 | server1 | rest api with complete live data |
