@@ -43,7 +43,7 @@ node js app;lication for maintenance tasks, like import scripts.
 command line interface to call methods on node application 
 
 Commands:
-  img db:create [db]         creates a new database
+  img db:create [db]         creates a new databas
   img db:drop [db]           deletes a database
   img db:update [db]         updates a database to latest backup
   img db:config              show databases
