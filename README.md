@@ -16,9 +16,9 @@
 | /publieke-data/docs/ | swagger interface |
 | /pgadmin4/ | pgadmin interface |
 
-Overige containers:
+### Overige containers:
 
-c|naaam|omschrijving|
+|naaam|omschrijving|
 |---|---|
 | db1 | postgres databases | 
 | pgadmin1 | webinterface for postgres |
