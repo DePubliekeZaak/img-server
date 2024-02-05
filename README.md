@@ -4,6 +4,7 @@
  cp .env.example .env
  nano .env
  docker-compose up -d
+
 ```
  
 ### nginx
@@ -22,7 +23,7 @@
 
 ### Overige containers:
 
-|naaam|omschrijving|
+|naam|omschrijving|
 |---|---|
 | db1 | postgres databases | 
 | pgadmin1 | webinterface for postgres |
