@@ -5,7 +5,7 @@ import { stripCurrency } from './format.factory';
 
 const rowByDesc = (rows: any[], desc: string) =>  {
 
-    const row = rows.find( r => r[1] == desc);
+    const row = rows.find( r => r[0] == desc);
 
     if(row === undefined) {
         console.log("error at " + desc)
@@ -24,6 +24,9 @@ export const parseIms = (data: any, date: Date, week: number) => {
 
     data = xlsx.parse(data);
 
+
+    console.log(date);
+
     let object = {                
 
         datum: formatDate(date),
@@ -31,9 +34,8 @@ export const parseIms = (data: any, date: Date, week: number) => {
     };
 
     const rows = data[0].data;
-    const column = rows[2].indexOf("Week " + (week).toString())
+    const column = rows[0].indexOf("Week " + (week).toString())
 
-    // console.log(rows);
     console.log(column);
 
     object["pc4"] = "-";

@@ -7,7 +7,7 @@ exports.parseIms = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const date_factory_1 = require("./date.factory");
 const rowByDesc = (rows, desc) => {
-    const row = rows.find(r => r[1] == desc);
+    const row = rows.find(r => r[0] == desc);
     if (row === undefined) {
         console.log("error at " + desc);
     }
@@ -19,13 +19,13 @@ const removePercentage = (s) => {
 };
 const parseIms = (data, date, week) => {
     data = node_xlsx_1.default.parse(data);
+    console.log(date);
     let object = {
         datum: (0, date_factory_1.formatDate)(date),
         gemeente: 'all'
     };
     const rows = data[0].data;
-    const column = rows[2].indexOf("Week " + (week).toString());
-    // console.log(rows);
+    const column = rows[0].indexOf("Week " + (week).toString());
     console.log(column);
     object["pc4"] = "-";
     object["ingediend"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[column]);

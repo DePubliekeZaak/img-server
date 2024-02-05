@@ -7,7 +7,7 @@ exports.parseWd = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const date_factory_1 = require("./date.factory");
 const rowByDesc = (rows, desc) => {
-    return rows.filter(r => r[1] == desc);
+    return rows.filter(r => r[0] == desc);
 };
 const removePercentage = (s) => {
     s = (parseFloat(s) * 100).toString();
@@ -22,7 +22,7 @@ const parseWd = (data, date, week) => {
     // console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
-    const column = rows[2].indexOf("Week " + (week).toString());
+    const column = rows[0].indexOf("Week " + (week).toString());
     // console.log(rows);
     object["aanvragen"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[1][column]);
     object["aanvragers"] = parseInt(rowByDesc(rows, 'Unieke aanvragers')[0][column]);

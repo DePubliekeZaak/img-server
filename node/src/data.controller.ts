@@ -87,6 +87,7 @@ export class DataController implements IDataController {
                 case 'wdims':
 
                     data = await this.bucket.readXlxs(year + '/' + week + '/wdims.xlsx');
+
                     date = nextMondayFromWeek(week, year);// from fileName ? 
   
                     const imsData = parseIms(data,date,parseInt(week));

@@ -4,7 +4,7 @@ import { stripCurrency } from './format.factory';
 
 const rowByDesc = (rows: any[], desc: string) =>  {
 
-    return rows.filter( r => r[1] == desc);
+    return rows.filter( r => r[0] == desc);
 }
 
 const removePercentage = (s: string) => {
@@ -26,7 +26,7 @@ export const parseWd = (data: any, date: Date, week: number) => {
     // console.log(week);
     // const latestRow = 5;
     const rows = data[0].data;
-    const column = rows[2].indexOf("Week " + (week).toString());
+    const column = rows[0].indexOf("Week " + (week).toString());
 
     // console.log(rows);
 

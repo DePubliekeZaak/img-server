@@ -10,6 +10,5 @@ RUN npm install
 COPY ../node/dist .
 
 EXPOSE 3009
-# RUN export PGPASSWORD="02HwLhYUm88eNJF79bcfEN5LNU0p8rtq"
 CMD [ "nodemon", "app.js" ]
 
