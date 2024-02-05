@@ -15,17 +15,12 @@
 /publieke-data/docs/ --> swagger interface 
 /pgadmin4/ --> pgadmin interface 
 
-### db1:
-postgres databases 
+Overige containers:
 
-### pgadmin1:
-webinterface for postgres 
-
-### server1:
-rest api with complete live data 
-
-### staging-server1:
-rest api with complete staging data 
+| db1 | postgres databases | 
+| pgadmin1 | webinterface for postgres |
+| server1 | rest api with complete live data |
+| staging-server1 | rest api with complete staging data | 
 
 ### dev-server1:
 rest api with complete dev data 
