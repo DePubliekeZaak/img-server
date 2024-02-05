@@ -1,6 +1,10 @@
 
+```
  cd docker
- docker-compose up -d 
+ cp .env.example .env
+ nano .env
+ docker-compose up -d
+```
  
 ### nginx
  nginx server that provides access through:
