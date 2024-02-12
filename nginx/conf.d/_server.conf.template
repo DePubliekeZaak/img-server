@@ -17,3 +17,23 @@ server {
 
 	include /etc/nginx/conf.d/graphs/*.locations;
 }
+
+server {
+        listen 80;
+       root /var/www/html;
+       index index.html;
+       server_name img.${DOMAIN2}; 
+
+       include /etc/nginx/conf.d/img/*locations;
+}
+
+
+# serveert de bundle.js en topojson files voor het live dashboard
+# domein en paden (redirects) zijn relevant voor integratie met cms 
+server {
+        listen 80;
+        root /var/www/html;
+        server_name graphs.${DOMAIN2};
+
+	include /etc/nginx/conf.d/graphs/*.locations;
+}
