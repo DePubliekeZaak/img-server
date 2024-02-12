@@ -28,9 +28,9 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 
 // node_modules/defer-to-connect/dist/source/index.js
 var require_source = __commonJS({
-  "node_modules/defer-to-connect/dist/source/index.js"(exports, module2) {
+  "node_modules/defer-to-connect/dist/source/index.js"(exports2, module2) {
     "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
+    Object.defineProperty(exports2, "__esModule", { value: true });
     function isTLSSocket(socket) {
       return socket.encrypted;
     }
@@ -68,7 +68,7 @@ var require_source = __commonJS({
         listeners.close(socket._hadError);
       }
     };
-    exports.default = deferToConnect2;
+    exports2.default = deferToConnect2;
     module2.exports = deferToConnect2;
     module2.exports.default = deferToConnect2;
   }
@@ -76,7 +76,7 @@ var require_source = __commonJS({
 
 // node_modules/get-stream/buffer-stream.js
 var require_buffer_stream = __commonJS({
-  "node_modules/get-stream/buffer-stream.js"(exports, module2) {
+  "node_modules/get-stream/buffer-stream.js"(exports2, module2) {
     "use strict";
     var { PassThrough: PassThroughStream2 } = require("stream");
     module2.exports = (options) => {
@@ -121,7 +121,7 @@ var require_buffer_stream = __commonJS({
 
 // node_modules/get-stream/index.js
 var require_get_stream = __commonJS({
-  "node_modules/get-stream/index.js"(exports, module2) {
+  "node_modules/get-stream/index.js"(exports2, module2) {
     "use strict";
     var { constants: BufferConstants } = require("buffer");
     var stream2 = require("stream");
@@ -134,7 +134,7 @@ var require_get_stream = __commonJS({
         this.name = "MaxBufferError";
       }
     };
-    async function getStream2(inputStream, options) {
+    async function getStream3(inputStream, options) {
       if (!inputStream) {
         throw new Error("Expected a stream");
       }
@@ -167,16 +167,16 @@ var require_get_stream = __commonJS({
       });
       return stream3.getBufferedValue();
     }
-    module2.exports = getStream2;
-    module2.exports.buffer = (stream3, options) => getStream2(stream3, { ...options, encoding: "buffer" });
-    module2.exports.array = (stream3, options) => getStream2(stream3, { ...options, array: true });
+    module2.exports = getStream3;
+    module2.exports.buffer = (stream3, options) => getStream3(stream3, { ...options, encoding: "buffer" });
+    module2.exports.array = (stream3, options) => getStream3(stream3, { ...options, array: true });
     module2.exports.MaxBufferError = MaxBufferError;
   }
 });
 
 // node_modules/http-cache-semantics/index.js
 var require_http_cache_semantics = __commonJS({
-  "node_modules/http-cache-semantics/index.js"(exports, module2) {
+  "node_modules/http-cache-semantics/index.js"(exports2, module2) {
     "use strict";
     var statusCodeCacheableByDefault = /* @__PURE__ */ new Set([
       200,
@@ -648,8 +648,8 @@ var require_http_cache_semantics = __commonJS({
 
 // node_modules/json-buffer/index.js
 var require_json_buffer = __commonJS({
-  "node_modules/json-buffer/index.js"(exports) {
-    exports.stringify = function stringify(o) {
+  "node_modules/json-buffer/index.js"(exports2) {
+    exports2.stringify = function stringify(o) {
       if ("undefined" == typeof o)
         return o;
       if (o && Buffer.isBuffer(o))
@@ -686,7 +686,7 @@ var require_json_buffer = __commonJS({
       } else
         return JSON.stringify(o);
     };
-    exports.parse = function(s) {
+    exports2.parse = function(s) {
       return JSON.parse(s, function(key, value) {
         if ("string" === typeof value) {
           if (/^:base64:/.test(value))
@@ -702,7 +702,7 @@ var require_json_buffer = __commonJS({
 
 // node_modules/keyv/src/index.js
 var require_src = __commonJS({
-  "node_modules/keyv/src/index.js"(exports, module2) {
+  "node_modules/keyv/src/index.js"(exports2, module2) {
     "use strict";
     var EventEmitter3 = require("events");
     var JSONB = require_json_buffer();
@@ -759,7 +759,7 @@ var require_src = __commonJS({
         this.opts.store.namespace = this.opts.namespace;
         const generateIterator = (iterator) => async function* () {
           for await (const [key, raw] of typeof iterator === "function" ? iterator(this.opts.store.namespace) : iterator) {
-            const data = this.opts.deserialize(raw);
+            const data = await this.opts.deserialize(raw);
             if (this.opts.store.namespace && !key.includes(this.opts.store.namespace)) {
               continue;
             }
@@ -820,23 +820,19 @@ var require_src = __commonJS({
             return void 0;
           }
           if (isArray) {
-            const result = [];
-            for (let row of data) {
+            return data.map((row, index) => {
               if (typeof row === "string") {
                 row = this.opts.deserialize(row);
               }
               if (row === void 0 || row === null) {
-                result.push(void 0);
-                continue;
+                return void 0;
               }
               if (typeof row.expires === "number" && Date.now() > row.expires) {
-                this.delete(key).then(() => void 0);
-                result.push(void 0);
-              } else {
-                result.push(options && options.raw ? row : row.value);
+                this.delete(key[index]).then(() => void 0);
+                return void 0;
               }
-            }
-            return result;
+              return options && options.raw ? row : row.value;
+            });
           }
           if (typeof data.expires === "number" && Date.now() > data.expires) {
             return this.delete(key).then(() => void 0);
@@ -904,9 +900,9 @@ var require_src = __commonJS({
   }
 });
 
-// node_modules/got/node_modules/mimic-response/index.js
+// node_modules/decompress-response/node_modules/mimic-response/index.js
 var require_mimic_response = __commonJS({
-  "node_modules/got/node_modules/mimic-response/index.js"(exports, module2) {
+  "node_modules/decompress-response/node_modules/mimic-response/index.js"(exports2, module2) {
     "use strict";
     var knownProperties2 = [
       "aborted",
@@ -971,9 +967,9 @@ var require_mimic_response = __commonJS({
   }
 });
 
-// node_modules/got/node_modules/decompress-response/index.js
+// node_modules/decompress-response/index.js
 var require_decompress_response = __commonJS({
-  "node_modules/got/node_modules/decompress-response/index.js"(exports, module2) {
+  "node_modules/decompress-response/index.js"(exports2, module2) {
     "use strict";
     var { Transform, PassThrough } = require("stream");
     var zlib = require("zlib");
@@ -1022,7 +1018,7 @@ var require_decompress_response = __commonJS({
 
 // node_modules/quick-lru/index.js
 var require_quick_lru = __commonJS({
-  "node_modules/quick-lru/index.js"(exports, module2) {
+  "node_modules/quick-lru/index.js"(exports2, module2) {
     "use strict";
     var QuickLRU = class {
       constructor(options = {}) {
@@ -1128,7 +1124,7 @@ var require_quick_lru = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/delay-async-destroy.js
 var require_delay_async_destroy = __commonJS({
-  "node_modules/http2-wrapper/source/utils/delay-async-destroy.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/delay-async-destroy.js"(exports2, module2) {
     "use strict";
     module2.exports = (stream2) => {
       if (stream2.listenerCount("error") !== 0) {
@@ -1158,7 +1154,7 @@ var require_delay_async_destroy = __commonJS({
 
 // node_modules/http2-wrapper/source/agent.js
 var require_agent = __commonJS({
-  "node_modules/http2-wrapper/source/agent.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/agent.js"(exports2, module2) {
     "use strict";
     var { URL: URL4 } = require("url");
     var EventEmitter3 = require("events");
@@ -1259,7 +1255,7 @@ var require_agent = __commonJS({
         session.close();
       }
     };
-    var Agent = class extends EventEmitter3 {
+    var Agent = class _Agent extends EventEmitter3 {
       constructor({ timeout = 0, maxSessions = Number.POSITIVE_INFINITY, maxEmptySessions = 10, maxCachedTlsSessions = 100 } = {}) {
         super();
         this.sessions = {};
@@ -1621,7 +1617,7 @@ var require_agent = __commonJS({
         });
       }
       async createConnection(origin, options) {
-        return Agent.connect(origin, options);
+        return _Agent.connect(origin, options);
       }
       static connect(origin, options) {
         options.ALPNProtocols = ["h2"];
@@ -1696,7 +1692,7 @@ var require_agent = __commonJS({
 
 // node_modules/http2-wrapper/source/incoming-message.js
 var require_incoming_message = __commonJS({
-  "node_modules/http2-wrapper/source/incoming-message.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/incoming-message.js"(exports2, module2) {
     "use strict";
     var { Readable } = require("stream");
     var IncomingMessage = class extends Readable {
@@ -1758,7 +1754,7 @@ var require_incoming_message = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/proxy-events.js
 var require_proxy_events = __commonJS({
-  "node_modules/http2-wrapper/source/utils/proxy-events.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/proxy-events.js"(exports2, module2) {
     "use strict";
     module2.exports = (from, to, events) => {
       for (const event of events) {
@@ -1770,7 +1766,7 @@ var require_proxy_events = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/errors.js
 var require_errors = __commonJS({
-  "node_modules/http2-wrapper/source/utils/errors.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/errors.js"(exports2, module2) {
     "use strict";
     var makeError = (Base, key, getMessage) => {
       module2.exports[key] = class NodeError extends Base {
@@ -1825,7 +1821,7 @@ var require_errors = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/is-request-pseudo-header.js
 var require_is_request_pseudo_header = __commonJS({
-  "node_modules/http2-wrapper/source/utils/is-request-pseudo-header.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/is-request-pseudo-header.js"(exports2, module2) {
     "use strict";
     module2.exports = (header) => {
       switch (header) {
@@ -1843,7 +1839,7 @@ var require_is_request_pseudo_header = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/validate-header-name.js
 var require_validate_header_name = __commonJS({
-  "node_modules/http2-wrapper/source/utils/validate-header-name.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/validate-header-name.js"(exports2, module2) {
     "use strict";
     var { ERR_INVALID_HTTP_TOKEN } = require_errors();
     var isRequestPseudoHeader = require_is_request_pseudo_header();
@@ -1858,7 +1854,7 @@ var require_validate_header_name = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/validate-header-value.js
 var require_validate_header_value = __commonJS({
-  "node_modules/http2-wrapper/source/utils/validate-header-value.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/validate-header-value.js"(exports2, module2) {
     "use strict";
     var {
       ERR_HTTP_INVALID_HEADER_VALUE,
@@ -1878,7 +1874,7 @@ var require_validate_header_value = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/proxy-socket-handler.js
 var require_proxy_socket_handler = __commonJS({
-  "node_modules/http2-wrapper/source/utils/proxy-socket-handler.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/proxy-socket-handler.js"(exports2, module2) {
     "use strict";
     var { ERR_HTTP2_NO_SOCKET_MANIPULATION } = require_errors();
     var proxySocketHandler = {
@@ -1967,7 +1963,7 @@ var require_proxy_socket_handler = __commonJS({
 
 // node_modules/http2-wrapper/source/client-request.js
 var require_client_request = __commonJS({
-  "node_modules/http2-wrapper/source/client-request.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/client-request.js"(exports2, module2) {
     "use strict";
     var { URL: URL4, urlToHttpOptions } = require("url");
     var http22 = require("http2");
@@ -2384,7 +2380,7 @@ var require_client_request = __commonJS({
 
 // node_modules/resolve-alpn/index.js
 var require_resolve_alpn = __commonJS({
-  "node_modules/resolve-alpn/index.js"(exports, module2) {
+  "node_modules/resolve-alpn/index.js"(exports2, module2) {
     "use strict";
     var tls = require("tls");
     module2.exports = (options = {}, connect = tls.connect) => new Promise((resolve5, reject) => {
@@ -2424,7 +2420,7 @@ var require_resolve_alpn = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/calculate-server-name.js
 var require_calculate_server_name = __commonJS({
-  "node_modules/http2-wrapper/source/utils/calculate-server-name.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/calculate-server-name.js"(exports2, module2) {
     "use strict";
     var { isIP } = require("net");
     var assert2 = require("assert");
@@ -2452,7 +2448,7 @@ var require_calculate_server_name = __commonJS({
 
 // node_modules/http2-wrapper/source/auto.js
 var require_auto = __commonJS({
-  "node_modules/http2-wrapper/source/auto.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/auto.js"(exports2, module2) {
     "use strict";
     var { URL: URL4, urlToHttpOptions } = require("url");
     var http3 = require("http");
@@ -2600,6 +2596,18 @@ var require_auto = __commonJS({
       } else if (agent) {
         options.agent = agent.http;
       }
+      if (options.headers) {
+        options.headers = { ...options.headers };
+        if (options.headers[":authority"]) {
+          if (!options.headers.host) {
+            options.headers.host = options.headers[":authority"];
+          }
+          delete options.headers[":authority"];
+        }
+        delete options.headers[":method"];
+        delete options.headers[":scheme"];
+        delete options.headers[":path"];
+      }
       return delayAsyncDestroy(http3.request(options, callback));
     };
     module2.exports.protocolCache = cache;
@@ -2610,7 +2618,7 @@ var require_auto = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/js-stream-socket.js
 var require_js_stream_socket = __commonJS({
-  "node_modules/http2-wrapper/source/utils/js-stream-socket.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/js-stream-socket.js"(exports2, module2) {
     "use strict";
     var stream2 = require("stream");
     var tls = require("tls");
@@ -2621,7 +2629,7 @@ var require_js_stream_socket = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/unexpected-status-code-error.js
 var require_unexpected_status_code_error = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/unexpected-status-code-error.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/unexpected-status-code-error.js"(exports2, module2) {
     "use strict";
     var UnexpectedStatusCodeError = class extends Error {
       constructor(statusCode, statusMessage = "") {
@@ -2636,7 +2644,7 @@ var require_unexpected_status_code_error = __commonJS({
 
 // node_modules/http2-wrapper/source/utils/check-type.js
 var require_check_type = __commonJS({
-  "node_modules/http2-wrapper/source/utils/check-type.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/utils/check-type.js"(exports2, module2) {
     "use strict";
     var checkType = (name, value, types2) => {
       const valid = types2.some((type) => {
@@ -2657,7 +2665,7 @@ var require_check_type = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/initialize.js
 var require_initialize = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/initialize.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/initialize.js"(exports2, module2) {
     "use strict";
     var { URL: URL4 } = require("url");
     var checkType = require_check_type();
@@ -2679,7 +2687,7 @@ var require_initialize = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/get-auth-headers.js
 var require_get_auth_headers = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/get-auth-headers.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/get-auth-headers.js"(exports2, module2) {
     "use strict";
     module2.exports = (self) => {
       const { username, password } = self.proxyOptions.url;
@@ -2698,7 +2706,7 @@ var require_get_auth_headers = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/h1-over-h2.js
 var require_h1_over_h2 = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/h1-over-h2.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/h1-over-h2.js"(exports2, module2) {
     "use strict";
     var tls = require("tls");
     var http3 = require("http");
@@ -2777,7 +2785,7 @@ var require_h1_over_h2 = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/h2-over-hx.js
 var require_h2_over_hx = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/h2-over-hx.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/h2-over-hx.js"(exports2, module2) {
     "use strict";
     var { Agent } = require_agent();
     var JSStreamSocket = require_js_stream_socket();
@@ -2815,7 +2823,7 @@ var require_h2_over_hx = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/h2-over-h2.js
 var require_h2_over_h2 = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/h2-over-h2.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/h2-over-h2.js"(exports2, module2) {
     "use strict";
     var { globalAgent } = require_agent();
     var Http2OverHttpX = require_h2_over_hx();
@@ -2847,13 +2855,13 @@ var require_h2_over_h2 = __commonJS({
 
 // node_modules/http2-wrapper/source/proxies/h2-over-h1.js
 var require_h2_over_h1 = __commonJS({
-  "node_modules/http2-wrapper/source/proxies/h2-over-h1.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/proxies/h2-over-h1.js"(exports2, module2) {
     "use strict";
     var http3 = require("http");
     var https2 = require("https");
     var Http2OverHttpX = require_h2_over_hx();
     var getAuthorizationHeaders = require_get_auth_headers();
-    var getStream2 = (request) => new Promise((resolve5, reject) => {
+    var getStream3 = (request) => new Promise((resolve5, reject) => {
       const onConnect = (response, socket, head) => {
         socket.unshift(head);
         request.off("error", reject);
@@ -2879,7 +2887,7 @@ var require_h2_over_h1 = __commonJS({
           },
           method: "CONNECT"
         }).end();
-        return getStream2(request);
+        return getStream3(request);
       }
     };
     module2.exports = {
@@ -2891,7 +2899,7 @@ var require_h2_over_h1 = __commonJS({
 
 // node_modules/http2-wrapper/source/index.js
 var require_source2 = __commonJS({
-  "node_modules/http2-wrapper/source/index.js"(exports, module2) {
+  "node_modules/http2-wrapper/source/index.js"(exports2, module2) {
     "use strict";
     var http22 = require("http2");
     var {
@@ -2942,7 +2950,7 @@ var require_source2 = __commonJS({
 
 // node_modules/node-version/index.js
 var require_node_version = __commonJS({
-  "node_modules/node-version/index.js"(exports, module2) {
+  "node_modules/node-version/index.js"(exports2, module2) {
     module2.exports = function() {
       var version = process.versions.node;
       var split = version.split(".");
@@ -2960,7 +2968,7 @@ var require_node_version = __commonJS({
 
 // node_modules/pseudomap/pseudomap.js
 var require_pseudomap = __commonJS({
-  "node_modules/pseudomap/pseudomap.js"(exports, module2) {
+  "node_modules/pseudomap/pseudomap.js"(exports2, module2) {
     var hasOwnProperty = Object.prototype.hasOwnProperty;
     module2.exports = PseudoMap;
     function PseudoMap(set2) {
@@ -3055,7 +3063,7 @@ var require_pseudomap = __commonJS({
 
 // node_modules/pseudomap/map.js
 var require_map = __commonJS({
-  "node_modules/pseudomap/map.js"(exports, module2) {
+  "node_modules/pseudomap/map.js"(exports2, module2) {
     if (process.env.npm_package_name === "pseudomap" && process.env.npm_lifecycle_script === "test")
       process.env.TEST_PSEUDOMAP = "true";
     if (typeof Map === "function" && !process.env.TEST_PSEUDOMAP) {
@@ -3066,9 +3074,9 @@ var require_map = __commonJS({
   }
 });
 
-// node_modules/cross-spawn/node_modules/yallist/yallist.js
+// node_modules/yallist/yallist.js
 var require_yallist = __commonJS({
-  "node_modules/cross-spawn/node_modules/yallist/yallist.js"(exports, module2) {
+  "node_modules/yallist/yallist.js"(exports2, module2) {
     module2.exports = Yallist;
     Yallist.Node = Node;
     Yallist.create = Yallist;
@@ -3392,9 +3400,9 @@ var require_yallist = __commonJS({
   }
 });
 
-// node_modules/cross-spawn/node_modules/lru-cache/index.js
+// node_modules/lru-cache/index.js
 var require_lru_cache = __commonJS({
-  "node_modules/cross-spawn/node_modules/lru-cache/index.js"(exports, module2) {
+  "node_modules/lru-cache/index.js"(exports2, module2) {
     "use strict";
     module2.exports = LRUCache;
     var Map2 = require_map();
@@ -3790,7 +3798,7 @@ var require_lru_cache = __commonJS({
 
 // node_modules/isexe/windows.js
 var require_windows = __commonJS({
-  "node_modules/isexe/windows.js"(exports, module2) {
+  "node_modules/isexe/windows.js"(exports2, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
     var fs = require("fs");
@@ -3830,7 +3838,7 @@ var require_windows = __commonJS({
 
 // node_modules/isexe/mode.js
 var require_mode = __commonJS({
-  "node_modules/isexe/mode.js"(exports, module2) {
+  "node_modules/isexe/mode.js"(exports2, module2) {
     module2.exports = isexe;
     isexe.sync = sync;
     var fs = require("fs");
@@ -3863,7 +3871,7 @@ var require_mode = __commonJS({
 
 // node_modules/isexe/index.js
 var require_isexe = __commonJS({
-  "node_modules/isexe/index.js"(exports, module2) {
+  "node_modules/isexe/index.js"(exports2, module2) {
     var fs = require("fs");
     var core;
     if (process.platform === "win32" || global.TESTING_WINDOWS) {
@@ -3918,7 +3926,7 @@ var require_isexe = __commonJS({
 
 // node_modules/which/which.js
 var require_which = __commonJS({
-  "node_modules/which/which.js"(exports, module2) {
+  "node_modules/which/which.js"(exports2, module2) {
     module2.exports = which;
     which.sync = whichSync;
     var isWindows = process.platform === "win32" || process.env.OSTYPE === "cygwin" || process.env.OSTYPE === "msys";
@@ -4033,7 +4041,7 @@ var require_which = __commonJS({
 
 // node_modules/cross-spawn/lib/resolveCommand.js
 var require_resolveCommand = __commonJS({
-  "node_modules/cross-spawn/lib/resolveCommand.js"(exports, module2) {
+  "node_modules/cross-spawn/lib/resolveCommand.js"(exports2, module2) {
     "use strict";
     var path = require("path");
     var which = require_which();
@@ -4059,7 +4067,7 @@ var require_resolveCommand = __commonJS({
 
 // node_modules/cross-spawn/lib/hasBrokenSpawn.js
 var require_hasBrokenSpawn = __commonJS({
-  "node_modules/cross-spawn/lib/hasBrokenSpawn.js"(exports, module2) {
+  "node_modules/cross-spawn/lib/hasBrokenSpawn.js"(exports2, module2) {
     "use strict";
     module2.exports = function() {
       if (process.platform !== "win32") {
@@ -4075,7 +4083,7 @@ var require_hasBrokenSpawn = __commonJS({
 
 // node_modules/cross-spawn/lib/parse.js
 var require_parse = __commonJS({
-  "node_modules/cross-spawn/lib/parse.js"(exports, module2) {
+  "node_modules/cross-spawn/lib/parse.js"(exports2, module2) {
     "use strict";
     var fs = require("fs");
     var LRU = require_lru_cache();
@@ -4172,7 +4180,7 @@ var require_parse = __commonJS({
 
 // node_modules/cross-spawn/lib/enoent.js
 var require_enoent = __commonJS({
-  "node_modules/cross-spawn/lib/enoent.js"(exports, module2) {
+  "node_modules/cross-spawn/lib/enoent.js"(exports2, module2) {
     "use strict";
     var isWin = process.platform === "win32";
     var resolveCommand = require_resolveCommand();
@@ -4228,7 +4236,7 @@ var require_enoent = __commonJS({
 
 // node_modules/cross-spawn/index.js
 var require_cross_spawn = __commonJS({
-  "node_modules/cross-spawn/index.js"(exports, module2) {
+  "node_modules/cross-spawn/index.js"(exports2, module2) {
     "use strict";
     var cp = require("child_process");
     var parse = require_parse();
@@ -4269,7 +4277,7 @@ var require_cross_spawn = __commonJS({
 
 // node_modules/promise-polyfill/promise.js
 var require_promise = __commonJS({
-  "node_modules/promise-polyfill/promise.js"(exports, module2) {
+  "node_modules/promise-polyfill/promise.js"(exports2, module2) {
     (function(root) {
       var setTimeoutFunc = setTimeout;
       function noop3() {
@@ -4463,13 +4471,13 @@ var require_promise = __commonJS({
       } else if (!root.Promise) {
         root.Promise = Promise2;
       }
-    })(exports);
+    })(exports2);
   }
 });
 
 // node_modules/child-process-promise/lib/ChildProcessPromise.js
 var require_ChildProcessPromise = __commonJS({
-  "node_modules/child-process-promise/lib/ChildProcessPromise.js"(exports, module2) {
+  "node_modules/child-process-promise/lib/ChildProcessPromise.js"(exports2, module2) {
     "use strict";
     var Promise2;
     if (require_node_version().major >= 4) {
@@ -4523,7 +4531,7 @@ var require_ChildProcessPromise = __commonJS({
 
 // node_modules/child-process-promise/lib/ChildProcessError.js
 var require_ChildProcessError = __commonJS({
-  "node_modules/child-process-promise/lib/ChildProcessError.js"(exports, module2) {
+  "node_modules/child-process-promise/lib/ChildProcessError.js"(exports2, module2) {
     "use strict";
     var ChildProcessError = class extends Error {
       constructor(message, code, childProcess, stdout, stderr) {
@@ -4542,7 +4550,7 @@ var require_ChildProcessError = __commonJS({
 
 // node_modules/child-process-promise/lib/index.js
 var require_lib = __commonJS({
-  "node_modules/child-process-promise/lib/index.js"(exports) {
+  "node_modules/child-process-promise/lib/index.js"(exports2) {
     "use strict";
     var child_process = require("child_process");
     var crossSpawn = require_cross_spawn();
@@ -4643,18 +4651,18 @@ var require_lib = __commonJS({
     function fork(modulePath, args, options) {
       return doSpawn(child_process.fork, modulePath, args, options);
     }
-    exports.exec = exec;
-    exports.execFile = execFile;
-    exports.spawn = spawn;
-    exports.fork = fork;
+    exports2.exec = exec;
+    exports2.execFile = execFile;
+    exports2.spawn = spawn;
+    exports2.fork = fork;
   }
 });
 
 // node_modules/child-process-promise/lib-es5/ChildProcessPromise.js
 var require_ChildProcessPromise2 = __commonJS({
-  "node_modules/child-process-promise/lib-es5/ChildProcessPromise.js"(exports, module2) {
+  "node_modules/child-process-promise/lib-es5/ChildProcessPromise.js"(exports2, module2) {
     "use strict";
-    var _createClass = function() {
+    var _createClass = /* @__PURE__ */ function() {
       function defineProperties(target, props) {
         for (var i = 0; i < props.length; i++) {
           var descriptor = props[i];
@@ -4779,7 +4787,7 @@ var require_ChildProcessPromise2 = __commonJS({
 
 // node_modules/child-process-promise/lib-es5/ChildProcessError.js
 var require_ChildProcessError2 = __commonJS({
-  "node_modules/child-process-promise/lib-es5/ChildProcessError.js"(exports, module2) {
+  "node_modules/child-process-promise/lib-es5/ChildProcessError.js"(exports2, module2) {
     "use strict";
     function _classCallCheck(instance, Constructor) {
       if (!(instance instanceof Constructor)) {
@@ -4821,7 +4829,7 @@ var require_ChildProcessError2 = __commonJS({
 
 // node_modules/child-process-promise/lib-es5/index.js
 var require_lib_es5 = __commonJS({
-  "node_modules/child-process-promise/lib-es5/index.js"(exports) {
+  "node_modules/child-process-promise/lib-es5/index.js"(exports2) {
     "use strict";
     var child_process = require("child_process");
     var crossSpawn = require_cross_spawn();
@@ -4922,16 +4930,16 @@ var require_lib_es5 = __commonJS({
     function fork(modulePath, args, options) {
       return doSpawn(child_process.fork, modulePath, args, options);
     }
-    exports.exec = exec;
-    exports.execFile = execFile;
-    exports.spawn = spawn;
-    exports.fork = fork;
+    exports2.exec = exec;
+    exports2.execFile = execFile;
+    exports2.spawn = spawn;
+    exports2.fork = fork;
   }
 });
 
 // node_modules/child-process-promise/index.js
 var require_child_process_promise = __commonJS({
-  "node_modules/child-process-promise/index.js"(exports, module2) {
+  "node_modules/child-process-promise/index.js"(exports2, module2) {
     "use strict";
     if (require_node_version().major >= 4) {
       module2.exports = require_lib();
@@ -6264,12 +6272,12 @@ function getProcessArgvBin() {
 }
 
 // node_modules/yargs/build/lib/yerror.js
-var YError = class extends Error {
+var YError = class _YError extends Error {
   constructor(msg) {
     super(msg || "yargs error");
     this.name = "YError";
     if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, YError);
+      Error.captureStackTrace(this, _YError);
     }
   }
 };
@@ -7787,9 +7795,7 @@ var Completion = class {
         const negable = !!options.configuration["boolean-negation"] && options.boolean.includes(key);
         const isPositionalKey = positionalKeys.includes(key);
         if (!isPositionalKey && !options.hiddenOptions.includes(key) && !this.argsContainKey(args, key, negable)) {
-          this.completeOptionKey(key, completions, current);
-          if (negable && !!options.default[key])
-            this.completeOptionKey(`no-${key}`, completions, current);
+          this.completeOptionKey(key, completions, current, negable && !!options.default[key]);
         }
       });
     }
@@ -7865,22 +7871,25 @@ var Completion = class {
     }
     return false;
   }
-  completeOptionKey(key, completions, current) {
-    var _a2, _b2, _c2;
-    const descs = this.usage.getDescriptions();
-    const startsByTwoDashes = (s) => /^--/.test(s);
-    const isShortOption = (s) => /^[^0-9]$/.test(s);
-    const dashes = !startsByTwoDashes(current) && isShortOption(key) ? "-" : "--";
-    if (!this.zshShell) {
-      completions.push(dashes + key);
-    } else {
-      const aliasKey = (_a2 = this === null || this === void 0 ? void 0 : this.aliases) === null || _a2 === void 0 ? void 0 : _a2[key].find((alias) => {
+  completeOptionKey(key, completions, current, negable) {
+    var _a2, _b2, _c2, _d;
+    let keyWithDesc = key;
+    if (this.zshShell) {
+      const descs = this.usage.getDescriptions();
+      const aliasKey = (_b2 = (_a2 = this === null || this === void 0 ? void 0 : this.aliases) === null || _a2 === void 0 ? void 0 : _a2[key]) === null || _b2 === void 0 ? void 0 : _b2.find((alias) => {
         const desc2 = descs[alias];
         return typeof desc2 === "string" && desc2.length > 0;
       });
       const descFromAlias = aliasKey ? descs[aliasKey] : void 0;
-      const desc = (_c2 = (_b2 = descs[key]) !== null && _b2 !== void 0 ? _b2 : descFromAlias) !== null && _c2 !== void 0 ? _c2 : "";
-      completions.push(dashes + `${key.replace(/:/g, "\\:")}:${desc.replace("__yargsString__:", "").replace(/(\r\n|\n|\r)/gm, " ")}`);
+      const desc = (_d = (_c2 = descs[key]) !== null && _c2 !== void 0 ? _c2 : descFromAlias) !== null && _d !== void 0 ? _d : "";
+      keyWithDesc = `${key.replace(/:/g, "\\:")}:${desc.replace("__yargsString__:", "").replace(/(\r\n|\n|\r)/gm, " ")}`;
+    }
+    const startsByTwoDashes = (s) => /^--/.test(s);
+    const isShortOption = (s) => /^[^0-9]$/.test(s);
+    const dashes = !startsByTwoDashes(current) && isShortOption(key) ? "-" : "--";
+    completions.push(dashes + keyWithDesc);
+    if (negable) {
+      completions.push(dashes + "no-" + keyWithDesc);
     }
   }
   customCompletion(args, argv, current, done) {
@@ -9293,7 +9302,7 @@ var YargsInstance = class {
   }
   [kDeleteFromParserHintObject](optionKey) {
     objectKeys(__classPrivateFieldGet(this, _YargsInstance_options, "f")).forEach((hintKey) => {
-      if (((key) => key === "configObjects")(hintKey))
+      if (/* @__PURE__ */ ((key) => key === "configObjects")(hintKey))
         return;
       const hint = __classPrivateFieldGet(this, _YargsInstance_options, "f")[hintKey];
       if (Array.isArray(hint)) {
@@ -9421,7 +9430,7 @@ var YargsInstance = class {
       key.forEach((k) => {
         builder(k, value);
       });
-    } else if (((key2) => typeof key2 === "object")(key)) {
+    } else if (/* @__PURE__ */ ((key2) => typeof key2 === "object")(key)) {
       for (const k of objectKeys(key)) {
         builder(k, key[k]);
       }
@@ -9880,20 +9889,27 @@ function is(value) {
     return "null";
   }
   switch (typeof value) {
-    case "undefined":
+    case "undefined": {
       return "undefined";
-    case "string":
+    }
+    case "string": {
       return "string";
-    case "number":
+    }
+    case "number": {
       return Number.isNaN(value) ? "NaN" : "number";
-    case "boolean":
+    }
+    case "boolean": {
       return "boolean";
-    case "function":
+    }
+    case "function": {
       return "Function";
-    case "bigint":
+    }
+    case "bigint": {
       return "bigint";
-    case "symbol":
+    }
+    case "symbol": {
       return "symbol";
+    }
     default:
   }
   if (is.observable(value)) {
@@ -9918,6 +9934,8 @@ is.undefined = isOfType("undefined");
 is.string = isOfType("string");
 var isNumberType = isOfType("number");
 is.number = (value) => isNumberType(value) && !is.nan(value);
+is.positiveNumber = (value) => is.number(value) && value > 0;
+is.negativeNumber = (value) => is.number(value) && value < 0;
 is.bigint = isOfType("bigint");
 is.function_ = isOfType("function");
 is.null_ = (value) => value === null;
@@ -10001,6 +10019,12 @@ is.plainObject = (value) => {
 is.typedArray = (value) => isTypedArrayName(getObjectType(value));
 var isValidLength = (value) => is.safeInteger(value) && value >= 0;
 is.arrayLike = (value) => !is.nullOrUndefined(value) && !is.function_(value) && isValidLength(value.length);
+is.tupleLike = (value, guards) => {
+  if (is.array(guards) && is.array(value) && guards.length === value.length) {
+    return guards.every((guard, index) => guard(value[index]));
+  }
+  return false;
+};
 is.inRange = (value, range) => {
   if (is.number(range)) {
     return value >= Math.min(0, range) && value <= Math.max(range, 0);
@@ -10080,6 +10104,8 @@ var assert = {
   undefined: (value) => assertType(is.undefined(value), "undefined", value),
   string: (value) => assertType(is.string(value), "string", value),
   number: (value) => assertType(is.number(value), "number", value),
+  positiveNumber: (value) => assertType(is.positiveNumber(value), "positive number", value),
+  negativeNumber: (value) => assertType(is.negativeNumber(value), "negative number", value),
   bigint: (value) => assertType(is.bigint(value), "bigint", value),
   // eslint-disable-next-line @typescript-eslint/ban-types
   function_: (value) => assertType(is.function_(value), "Function", value),
@@ -10145,6 +10171,7 @@ var assert = {
   plainObject: (value) => assertType(is.plainObject(value), "plain object", value),
   typedArray: (value) => assertType(is.typedArray(value), "TypedArray", value),
   arrayLike: (value) => assertType(is.arrayLike(value), "array-like", value),
+  tupleLike: (value, guards) => assertType(is.tupleLike(value, guards), "tuple-like", value),
   domElement: (value) => assertType(is.domElement(value), "HTMLElement", value),
   observable: (value) => assertType(is.observable(value), "Observable", value),
   nodeStream: (value) => assertType(is.nodeStream(value), "Node.js Stream", value),
@@ -10211,10 +10238,10 @@ var CancelError = class extends Error {
     return true;
   }
 };
-var PCancelable = class {
+var PCancelable = class _PCancelable {
   static fn(userFunction) {
     return (...arguments_) => {
-      return new PCancelable((resolve5, reject, onCancel) => {
+      return new _PCancelable((resolve5, reject, onCancel) => {
         arguments_.push(onCancel);
         userFunction(...arguments_).then(resolve5, reject);
       });
@@ -10789,7 +10816,7 @@ var Response = class extends import_node_stream.Readable {
 // node_modules/cacheable-request/dist/index.js
 var import_keyv = __toESM(require_src(), 1);
 
-// node_modules/cacheable-request/node_modules/mimic-response/index.js
+// node_modules/mimic-response/index.js
 var knownProperties = [
   "aborted",
   "complete",
@@ -11001,7 +11028,7 @@ var CacheableRequest = class {
         const get = async (options_) => {
           await Promise.resolve();
           const cacheEntry = options_.cache ? await this.cache.get(key) : void 0;
-          if (typeof cacheEntry === "undefined" && !options_.forceRefresh) {
+          if (cacheEntry === void 0 && !options_.forceRefresh) {
             makeRequest(options_);
             return;
           }
@@ -12297,7 +12324,7 @@ var init = (options, withOptions, self) => {
     }
   }
 };
-var Options = class {
+var Options = class _Options {
   constructor(input, options, defaults2) {
     Object.defineProperty(this, "_unixOptions", {
       enumerable: true,
@@ -12326,7 +12353,7 @@ var Options = class {
     assert.any([dist_default.string, dist_default.urlInstance, dist_default.object, dist_default.undefined], input);
     assert.any([dist_default.object, dist_default.undefined], options);
     assert.any([dist_default.object, dist_default.undefined], defaults2);
-    if (input instanceof Options || options instanceof Options) {
+    if (input instanceof _Options || options instanceof _Options) {
       throw new TypeError("The defaults must be passed as the third argument");
     }
     this._internals = cloneInternals(defaults2?._internals ?? defaults2 ?? defaultInternals);
@@ -12365,7 +12392,7 @@ var Options = class {
     if (!options) {
       return;
     }
-    if (options instanceof Options) {
+    if (options instanceof _Options) {
       for (const init2 of options._init) {
         this.merge(init2);
       }
@@ -13642,6 +13669,7 @@ function isUnixSocketURL(url) {
 }
 
 // node_modules/got/dist/source/core/index.js
+var { buffer: getBuffer } = import_get_stream2.default;
 var supportsBrotli = dist_default.string(import_node_process2.default.versions.brotli);
 var methodsWithoutBody = /* @__PURE__ */ new Set(["GET", "HEAD"]);
 var cacheableStore = new WeakableMap();
@@ -13655,7 +13683,7 @@ var proxiedRequestEvents = [
 ];
 var noop2 = () => {
 };
-var Request = class extends import_node_stream3.Duplex {
+var Request = class _Request extends import_node_stream3.Duplex {
   constructor(url, options, defaults2) {
     super({
       // Don't destroy immediately, as the error may be emitted on unsuccessful retry
@@ -13830,7 +13858,7 @@ var Request = class extends import_node_stream3.Duplex {
     this.retryCount = 0;
     this._stopRetry = noop2;
     this.on("pipe", (source) => {
-      if (source.headers) {
+      if (source?.headers) {
         Object.assign(this.options.headers, source.headers);
       }
     });
@@ -13988,7 +14016,7 @@ var Request = class extends import_node_stream3.Duplex {
           }
           this.destroy();
           this.emit("retry", this.retryCount + 1, error, (updatedOptions) => {
-            const request = new Request(options.url, updatedOptions, options);
+            const request = new _Request(options.url, updatedOptions, options);
             request.retryCount = this.retryCount + 1;
             import_node_process2.default.nextTick(() => {
               void request.flush();
@@ -14307,7 +14335,7 @@ var Request = class extends import_node_stream3.Duplex {
       return false;
     }
     try {
-      const rawBody = await (0, import_get_stream2.buffer)(from);
+      const rawBody = await getBuffer(from);
       if (!this.isAborted) {
         this.response.rawBody = rawBody;
         return true;
@@ -15047,22 +15075,18 @@ yargs_default(hideBin(process.argv)).command("db:create [db]", "creates a new da
   const dbConfig = await node("db", { name: "new_db", db: argv.db });
   const res = await node("update", { db: argv.db });
   process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:publish [db]", "connect live dashboard to this database", (yargs) => {
-  return yargs.positional("db", {
-    describe: "the name of the database, for example img1"
-  });
+}).command("db:publish [db]", "promote staging database to public", (yargs) => {
+  return yargs;
 }, async (argv) => {
-  const dbConfig = await node("db", { name: "live_db", db: argv.db });
-  let res = await docker.compose(dbConfig);
-  process.stdout.write(res);
+  const res = await node("publish", {});
+  process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:stage [db]", "connect staging dashboard to this database", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"
   });
 }, async (argv) => {
-  const dbConfig = await node("db", { name: "staging_db", db: argv.db });
-  let res = await docker.compose(dbConfig);
-  process.stdout.write(res);
+  const res = await node("stage", { db: argv.db });
+  process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:backup [db] [name]", "backup database to the spaces bucket in digital ocean", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"

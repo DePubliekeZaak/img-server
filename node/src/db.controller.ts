@@ -104,9 +104,15 @@ export class DbController implements IDbController {
 
     }
 
-    async stage() {
+    async upgrade(dev_db: string, destination: string) {
 
-        // of vaste live db en vaste staging db en dan dump + restore 
+        await this.postgres.dump(dev_db,"switch");
+        await this.postgres.disconnect(destination);
+        await this.postgres.drop(destination);
+        await this.postgres.create(destination);
+        await this.postgres.restoreDump(destination)
+
+        return true;
     }
 
     async publish() {

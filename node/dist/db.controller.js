@@ -101,9 +101,14 @@ class DbController {
         return __awaiter(this, void 0, void 0, function* () {
         });
     }
-    stage() {
+    upgrade(dev_db, destination) {
         return __awaiter(this, void 0, void 0, function* () {
-            // of vaste live db en vaste staging db en dan dump + restore 
+            yield this.postgres.dump(dev_db, "switch");
+            yield this.postgres.disconnect(destination);
+            yield this.postgres.drop(destination);
+            yield this.postgres.create(destination);
+            yield this.postgres.restoreDump(destination);
+            return true;
         });
     }
     publish() {

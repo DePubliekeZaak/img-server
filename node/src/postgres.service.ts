@@ -4,6 +4,7 @@ let success = false;
 export interface IPostgresService {
 
     addView: (view: string, db: string) => Promise<boolean>;
+    disconnect: (db: string) => Promise<boolean>;
     drop: (db: string) => Promise<boolean>;
     create: (db: string) => void;
     createWebAnonRole: (db: string) => void;
@@ -26,6 +27,12 @@ export class PostgresService {
 
         const cmd = `grant select on api.${view} to web_anon;`;
         return await this.runPsql(cmd,db);
+    }
+
+    async disconnect(db: string) {
+
+        const cmd = `SELECT pg_terminate_backend (pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = '"${db}"'`;
+        return await this.runPsql(cmd, null);   
     }
 
     async drop(db: string) {

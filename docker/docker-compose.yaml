@@ -55,7 +55,7 @@ services:
     links:
       - "db1:db1"
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${LIVE}
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${PUBLIC}
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
     depends_on:
@@ -97,7 +97,7 @@ services:
     links:
       - "db1:db1"
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${LIVE}
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${PUBLIC}
       PGRST_DB_SCHEMA: publiek
       PGRST_DB_ANON_ROLE: web_anon
     depends_on:
@@ -121,20 +121,12 @@ services:
     networks:
       - img
 
-  redis:
-    image: redis:alpine
-    container_name: redis
-    networks:
-      - img
-
   node:
     image: custom_node
     container_name: node
     build:
       context: ..
       dockerfile: ./docker/node.Dockerfile
-    depends_on:
-      - redis
     ports: 
       - "3009:3009"
     volumes:

@@ -86,23 +86,17 @@ yargs(hideBin(process.argv))
   )
   .command(
       'db:publish [db]',
-      'connect live dashboard to this database',
+      'promote staging database to public',
       (yargs) => {
           return yargs
-          .positional( 'db', {
-            describe: 'the name of the database, for example img1'
-          })
       },
       async (argv) => {
 
-        const dbConfig = await node('db',{ name: 'live_db', db: argv.db });
-        // hoe had dit dan moeten werken als .wnv bestand niet wordt bijgewerkt? 
-        let res = await docker.compose(dbConfig)
-
-        process.stdout.write(res);
+        const res = await node('publish',{});
+        process.stdout.write(JSON.stringify(res) + '\n');
       }
     )
-    .command(
+  .command(
     'db:stage [db]',
     'connect staging dashboard to this database',
     (yargs) => {
@@ -113,10 +107,8 @@ yargs(hideBin(process.argv))
     },
     async (argv) => {
 
-        const dbConfig = await node('db',{ name: 'staging_db', db: argv.db });
-        let res = await docker.compose(dbConfig)
-
-        process.stdout.write(res);
+        const res = await node('stage',{ db: argv.db });
+        process.stdout.write(JSON.stringify(res) + '\n');
       }
     )
     .command(

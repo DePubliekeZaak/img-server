@@ -38,7 +38,7 @@ app.post('/import', async (req, res) => {
 
 // set new staging db 
 app.post('/stage', async (req, res) => {
-  res.send(await db.stage());
+  res.send(await db.upgrade(req.body.db, "staging"));
 });
 
 app.post('/backup', async (req, res) => {
@@ -46,8 +46,8 @@ app.post('/backup', async (req, res) => {
 });
 
 // set new live db 
-app.post('/db', async (req, res) => {
-  res.send(await db.setDb(req.body.name,req.body.db));
+app.post('/publish', async (req, res) => {
+  res.send(await db.upgrade("staging", "public"));
 });
 
 

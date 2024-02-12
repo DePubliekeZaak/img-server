@@ -21,6 +21,12 @@ class PostgresService {
             return yield this.runPsql(cmd, db);
         });
     }
+    disconnect(db) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const cmd = `SELECT pg_terminate_backend (pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = '"${db}"'`;
+            return yield this.runPsql(cmd, null);
+        });
+    }
     drop(db) {
         return __awaiter(this, void 0, void 0, function* () {
             const cmd = `DROP DATABASE IF EXISTS ${db} WITH (FORCE)`;

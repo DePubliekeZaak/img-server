@@ -44,14 +44,14 @@ app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 // set new staging db 
 app.post('/stage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.stage());
+    res.send(yield db.upgrade(req.body.db, "staging"));
 }));
 app.post('/backup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.backup(req.body.db, req.body.name));
 }));
 // set new live db 
-app.post('/db', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.setDb(req.body.name, req.body.db));
+app.post('/publish', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.send(yield db.upgrade("staging", "public"));
 }));
 app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.body.topic == 'all') {
