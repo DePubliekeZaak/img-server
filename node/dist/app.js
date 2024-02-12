@@ -35,9 +35,6 @@ app.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 app.post('/prepare', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.prepare(req.body.db));
 }));
-app.post('/config', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.config());
-}));
 // import data ...... ????????
 app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.import());
@@ -45,6 +42,10 @@ app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 // set new staging db 
 app.post('/stage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.upgrade(req.body.db, "staging"));
+}));
+// set new dev db 
+app.post('/dev', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.send(yield db.upgrade(req.body.db, "dev"));
 }));
 app.post('/backup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.backup(req.body.db, req.body.name));

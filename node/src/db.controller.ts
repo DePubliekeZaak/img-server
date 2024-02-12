@@ -34,7 +34,7 @@ export class DbController implements IDbController {
         try {
             await this.postgres.create(db);
             await this.bucket.fetchBackup();
-            await this.postgres.restoreDump(db) 
+            await this.postgres.restoreDump(db,"img-backup-latest") 
 
         } catch(err) {
             console.log(err);
@@ -78,21 +78,21 @@ export class DbController implements IDbController {
         }
     }
 
-    async config() {
+    // async config() {
 
-        return {
-            'LIVE' : await this.redis.read('live_db'),
-            'STAGING' : await this.redis.read('staging_db'),
-            'DEV' : await this.redis.read('dev_db'),
-            'NEW' : await this.redis.read('new_db'),
-        }
-    }
+    //     return {
+    //         'LIVE' : await this.redis.read('live_db'),
+    //         'STAGING' : await this.redis.read('staging_db'),
+    //         'DEV' : await this.redis.read('dev_db'),
+    //         'NEW' : await this.redis.read('new_db'),
+    //     }
+    // }
 
-    async setDb(name: string, db: string) {
+    // async setDb(name: string, db: string) {
         
-        await this.redis.write(name, db);
-        return await this.config();
-    }
+    //     await this.redis.write(name, db);
+    //     return await this.config();
+    // }
 
     async prepare(db: string) {
 
@@ -104,13 +104,13 @@ export class DbController implements IDbController {
 
     }
 
-    async upgrade(dev_db: string, destination: string) {
+    async upgrade(new_db: string, destination: string) {
 
-        await this.postgres.dump(dev_db,"switch");
+        await this.postgres.dump(new_db,"switch");
         await this.postgres.disconnect(destination);
         await this.postgres.drop(destination);
         await this.postgres.create(destination);
-        await this.postgres.restoreDump(destination)
+        await this.postgres.restoreDump(destination,"switch_dump")
 
         return true;
     }

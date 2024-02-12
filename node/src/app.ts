@@ -27,10 +27,6 @@ app.post('/prepare', async (req, res) => {
    res.send(await db.prepare(req.body.db));
 });
 
-app.post('/config', async (req, res) => {
-  res.send(await db.config());
-});
-
 // import data ...... ????????
 app.post('/import', async (req, res) => {
   res.send(await db.import());
@@ -39,6 +35,11 @@ app.post('/import', async (req, res) => {
 // set new staging db 
 app.post('/stage', async (req, res) => {
   res.send(await db.upgrade(req.body.db, "staging"));
+});
+
+// set new dev db 
+app.post('/dev', async (req, res) => {
+  res.send(await db.upgrade(req.body.db, "dev"));
 });
 
 app.post('/backup', async (req, res) => {

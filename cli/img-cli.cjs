@@ -15038,36 +15038,7 @@ var DockerService = class {
 
 // build/cli.js
 var docker = new DockerService();
-yargs_default(hideBin(process.argv)).command("db:create [db]", "creates a new database", (yargs) => {
-  return yargs.positional("db", {
-    describe: "the name of the database, for example img1"
-  });
-}, async (argv) => {
-  const res = await node("create", { db: argv.db });
-  process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:drop [db]", "deletes a database", (yargs) => {
-  return yargs.positional("db", {
-    describe: "the name of the database, for example img1"
-  });
-}, async (argv) => {
-  const res = await node("drop", { db: argv.db });
-  process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:update [db]", "updates a database to latest backup", (yargs) => {
-  return yargs.positional("db", {
-    describe: "the name of the database, for example img1"
-  });
-}, async (argv) => {
-  const res = await node("update", { db: argv.db });
-  process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:config", "show databases", (yargs) => {
-  return yargs;
-}, async (argv) => {
-  const res = await node("config", {});
-  for (const [key, value] of Object.entries(res)) {
-    process.stdout.write(`${key}: ${value} 
-`);
-  }
-}).command("db:prepare [db]", "prepare database for data entry", (yargs) => {
+yargs_default(hideBin(process.argv)).command("db:prepare [db]", "prepare database for data entry", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"
   });
@@ -15086,6 +15057,13 @@ yargs_default(hideBin(process.argv)).command("db:create [db]", "creates a new da
   });
 }, async (argv) => {
   const res = await node("stage", { db: argv.db });
+  process.stdout.write(JSON.stringify(res) + "\n");
+}).command("db:dev [db]", "connect dev dashboard to this database", (yargs) => {
+  return yargs.positional("db", {
+    describe: "the name of the database, for example img1"
+  });
+}, async (argv) => {
+  const res = await node("dev", { db: argv.db });
   process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:backup [db] [name]", "backup database to the spaces bucket in digital ocean", (yargs) => {
   return yargs.positional("db", {

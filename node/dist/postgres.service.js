@@ -71,7 +71,7 @@ class PostgresService {
     dump(db, name) {
         return __awaiter(this, void 0, void 0, function* () {
             const bin = "pg_dump";
-            const path = "/tmp/" + name + "_dump.sql";
+            const path = "/tmp/" + name + ".sql";
             const args = [
                 "-f",
                 path,
@@ -86,7 +86,7 @@ class PostgresService {
             return path;
         });
     }
-    restoreDump(db) {
+    restoreDump(db, name) {
         return __awaiter(this, void 0, void 0, function* () {
             const bin = "psql";
             const args = [
@@ -97,7 +97,7 @@ class PostgresService {
                 '-d',
                 db,
                 '-f',
-                '/tmp/img-backup-latest.sql'
+                `/tmp/${name}.sql`
             ];
             return yield this.childProcess(bin, args);
         });

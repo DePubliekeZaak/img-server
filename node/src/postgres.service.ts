@@ -11,7 +11,7 @@ export interface IPostgresService {
     insert: (data: any, tablke: string, db: string) => Promise<boolean>;
     dump: (db: string, name: string) => Promise<string>;
     importCsv: (db: string, topic: string) => Promise<string>;
-    restoreDump: (db: string) => Promise<string>;
+    restoreDump: (db: string, name: string) => Promise<string>;
 }
 
 export class PostgresService {
@@ -85,7 +85,7 @@ export class PostgresService {
     async dump(db: string, name: string) {
 
         const bin = "pg_dump";
-        const path = "/tmp/" + name + "_dump.sql";
+        const path = "/tmp/" + name + ".sql";
 
         const args = [
             "-f",
@@ -102,7 +102,7 @@ export class PostgresService {
         return path;
     }
 
-    async restoreDump(db: string) {
+    async restoreDump(db: string, name: string) {
 
         const bin = "psql";
 
@@ -114,7 +114,7 @@ export class PostgresService {
             '-d',
             db,
             '-f',
-            '/tmp/img-backup-latest.sql'
+            `/tmp/${name}.sql`
         ]
 
         return await this.childProcess(bin,args);

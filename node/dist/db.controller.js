@@ -34,7 +34,7 @@ class DbController {
             try {
                 yield this.postgres.create(db);
                 yield this.bucket.fetchBackup();
-                yield this.postgres.restoreDump(db);
+                yield this.postgres.restoreDump(db, "img-backup-latest");
             }
             catch (err) {
                 console.log(err);
@@ -75,22 +75,18 @@ class DbController {
             };
         });
     }
-    config() {
-        return __awaiter(this, void 0, void 0, function* () {
-            return {
-                'LIVE': yield this.redis.read('live_db'),
-                'STAGING': yield this.redis.read('staging_db'),
-                'DEV': yield this.redis.read('dev_db'),
-                'NEW': yield this.redis.read('new_db'),
-            };
-        });
-    }
-    setDb(name, db) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.redis.write(name, db);
-            return yield this.config();
-        });
-    }
+    // async config() {
+    //     return {
+    //         'LIVE' : await this.redis.read('live_db'),
+    //         'STAGING' : await this.redis.read('staging_db'),
+    //         'DEV' : await this.redis.read('dev_db'),
+    //         'NEW' : await this.redis.read('new_db'),
+    //     }
+    // }
+    // async setDb(name: string, db: string) {
+    //     await this.redis.write(name, db);
+    //     return await this.config();
+    // }
     prepare(db) {
         return __awaiter(this, void 0, void 0, function* () {
             this.redis.write('new_db', db);
@@ -101,13 +97,13 @@ class DbController {
         return __awaiter(this, void 0, void 0, function* () {
         });
     }
-    upgrade(dev_db, destination) {
+    upgrade(new_db, destination) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.postgres.dump(dev_db, "switch");
+            yield this.postgres.dump(new_db, "switch");
             yield this.postgres.disconnect(destination);
             yield this.postgres.drop(destination);
             yield this.postgres.create(destination);
-            yield this.postgres.restoreDump(destination);
+            yield this.postgres.restoreDump(destination, "switch_dump");
             return true;
         });
     }

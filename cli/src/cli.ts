@@ -8,66 +8,66 @@ import { DockerService, IDockerService } from './docker.js';
 const docker: IDockerService = new DockerService();
 
 yargs(hideBin(process.argv))
-  .command(
-    'db:create [db]',
-    'creates a new database',
-     (yargs) => {
-      return yargs
-      .positional('db', {
-        describe: 'the name of the database, for example img1'
-      })
-    },
-    async (argv) => { 
+  // .command(
+  //   'db:create [db]',
+  //   'creates a new database',
+  //    (yargs) => {
+  //     return yargs
+  //     .positional('db', {
+  //       describe: 'the name of the database, for example img1'
+  //     })
+  //   },
+  //   async (argv) => { 
 
-        const res = await node('create',{ db: argv.db });
-        process.stdout.write(JSON.stringify(res) + '\n');
-    }
-  )
-  .command(
-    'db:drop [db]',
-    'deletes a database',
-     (yargs) => {
-      return yargs
-      .positional('db', {
-        describe: 'the name of the database, for example img1'
-      })
-    },
-    async (argv) => { 
+  //       const res = await node('create',{ db: argv.db });
+  //       process.stdout.write(JSON.stringify(res) + '\n');
+  //   }
+  // )
+  // .command(
+  //   'db:drop [db]',
+  //   'deletes a database',
+  //    (yargs) => {
+  //     return yargs
+  //     .positional('db', {
+  //       describe: 'the name of the database, for example img1'
+  //     })
+  //   },
+  //   async (argv) => { 
 
-        const res = await node('drop',{ db: argv.db });
-        process.stdout.write(JSON.stringify(res) + '\n');
-    }
-  )
-  .command(
-    'db:update [db]',
-    'updates a database to latest backup',
-     (yargs) => {
-      return yargs
-      .positional('db', {
-        describe: 'the name of the database, for example img1'
-      })
-    },
-    async (argv) => { 
+  //       const res = await node('drop',{ db: argv.db });
+  //       process.stdout.write(JSON.stringify(res) + '\n');
+  //   }
+  // )
+  // .command(
+  //   'db:update [db]',
+  //   'updates a database to latest backup',
+  //    (yargs) => {
+  //     return yargs
+  //     .positional('db', {
+  //       describe: 'the name of the database, for example img1'
+  //     })
+  //   },
+  //   async (argv) => { 
 
-        const res = await node('update',{ db: argv.db });
-        process.stdout.write(JSON.stringify(res) + '\n');
-    }
-  )
-  .command(
-    'db:config',
-    'show databases',
-     (yargs) => {
-      return yargs
-    },
-    async (argv) => { 
+  //       const res = await node('update',{ db: argv.db });
+  //       process.stdout.write(JSON.stringify(res) + '\n');
+  //   }
+  // )
+  // .command(
+  //   'db:config',
+  //   'show databases',
+  //    (yargs) => {
+  //     return yargs
+  //   },
+  //   async (argv) => { 
 
-        const res: any = await node('config', {});
+  //       const res: any = await node('config', {});
 
-        for (const [key, value] of Object.entries(res)) {
-            process.stdout.write(`${key}: ${value} \n`);
-        }
-    }
-  )
+  //       for (const [key, value] of Object.entries(res)) {
+  //           process.stdout.write(`${key}: ${value} \n`);
+  //       }
+  //   }
+  // )
   .command(
     'db:prepare [db]',
     'prepare database for data entry',
@@ -108,6 +108,21 @@ yargs(hideBin(process.argv))
     async (argv) => {
 
         const res = await node('stage',{ db: argv.db });
+        process.stdout.write(JSON.stringify(res) + '\n');
+      }
+    )
+  .command(
+    'db:dev [db]',
+    'connect dev dashboard to this database',
+    (yargs) => {
+        return yargs
+        .positional( 'db', {
+            describe: 'the name of the database, for example img1'
+        })
+    },
+    async (argv) => {
+
+        const res = await node('dev',{ db: argv.db });
         process.stdout.write(JSON.stringify(res) + '\n');
       }
     )
