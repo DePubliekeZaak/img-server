@@ -14,6 +14,7 @@ services:
       - /var/www/html:/var/www/html
     environment:
       - DOMAIN=${DOMAIN}
+      - DOMAIN2=${DOMAIN2}
     command: /bin/sh -c "envsubst < /etc/nginx/conf.d/_server.conf.template > /etc/nginx/conf.d/_server.conf && nginx -g 'daemon off;'"
     ports:
       - 80:80
