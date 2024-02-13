@@ -41,6 +41,13 @@
             expires max; 
         }
         
+        
+    }
+
+    location /geojson/ {
+
+        alias /var/www/html/geojson/;
+
         location ~* \.(geojson|topojson)$ {
             add_header 'Access-Control-Allow-Origin' '*';
             add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
