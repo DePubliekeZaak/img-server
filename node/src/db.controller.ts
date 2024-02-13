@@ -10,6 +10,17 @@ export interface IDbController {
     addViewToApi: (view: string, db: string) => void;
 }
 
+declare global {
+    interface Date {
+        getWeek () : Number
+    }
+}
+
+Date.prototype.getWeek = function() {
+    var onejan : any = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
 export class DbController implements IDbController {
 
     postgres : IPostgresService;
@@ -62,11 +73,20 @@ export class DbController implements IDbController {
 
     async backup(db: string, name: string) {
 
+        const now = new Date();
+        const dated_name = `backup_${db}_${now.getWeek()}_${now.getFullYear()}`;
+
+        console.log(dated_name);
+
         try {
+
+          
 
             const path = await this.postgres.dump(db,name);
             const fileStream = await fs.createReadStream(path);
-            const res = await this.bucket.writeFile(fileStream, name, db);
+            const res = await this.bucket.writeFile(fileStream, "img-backup-latest");
+            const fileStream_ = await fs.createReadStream(path);
+            const res_ = await this.bucket.writeFile(fileStream_, dated_name);
 
         } catch(err) {
 
@@ -74,30 +94,13 @@ export class DbController implements IDbController {
         }
 
         return {
-            msg : 'backup for ' + name + "-" + db 
+            msg : 'backups send to digital ocean for ' + name + ' and ' + dated_name
         }
     }
 
-    // async config() {
-
-    //     return {
-    //         'LIVE' : await this.redis.read('live_db'),
-    //         'STAGING' : await this.redis.read('staging_db'),
-    //         'DEV' : await this.redis.read('dev_db'),
-    //         'NEW' : await this.redis.read('new_db'),
-    //     }
-    // }
-
-    // async setDb(name: string, db: string) {
-        
-    //     await this.redis.write(name, db);
-    //     return await this.config();
-    // }
-
     async prepare(db: string) {
 
-        this.redis.write('new_db',db);
-        return await this.update(db);
+
     }
 
     async import() {
@@ -106,7 +109,7 @@ export class DbController implements IDbController {
 
     async upgrade(new_db: string, destination: string) {
 
-        await this.postgres.dump(new_db,"switch");
+        await this.postgres.dump(new_db,"switch_dump");
         await this.postgres.disconnect(destination);
         await this.postgres.drop(destination);
         await this.postgres.create(destination);

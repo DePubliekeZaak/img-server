@@ -24,7 +24,7 @@ app.post('/update', async (req, res) => {
 
 // select inactive db and update db from latest backup
 app.post('/prepare', async (req, res) => {
-   res.send(await db.prepare(req.body.db));
+   res.send(await db.create(req.body.db));
 });
 
 // import data ...... ????????

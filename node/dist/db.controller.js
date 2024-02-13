@@ -17,6 +17,10 @@ const postgres_service_1 = require("./postgres.service");
 const bucket_service_1 = require("./bucket.service");
 const redis_service_1 = require("./redis.service");
 const fs_1 = __importDefault(require("fs"));
+Date.prototype.getWeek = function () {
+    var onejan = new Date(this.getFullYear(), 0, 1);
+    return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+};
 class DbController {
     constructor() {
         this.bucket = new bucket_service_1.BucketService();
@@ -62,35 +66,26 @@ class DbController {
     }
     backup(db, name) {
         return __awaiter(this, void 0, void 0, function* () {
+            const now = new Date();
+            const dated_name = `backup_${db}_${now.getWeek()}_${now.getFullYear()}`;
+            console.log(dated_name);
             try {
                 const path = yield this.postgres.dump(db, name);
                 const fileStream = yield fs_1.default.createReadStream(path);
-                const res = yield this.bucket.writeFile(fileStream, name, db);
+                const res = yield this.bucket.writeFile(fileStream, "img-backup-latest");
+                const fileStream_ = yield fs_1.default.createReadStream(path);
+                const res_ = yield this.bucket.writeFile(fileStream_, dated_name);
             }
             catch (err) {
                 console.log(err);
             }
             return {
-                msg: 'backup for ' + name + "-" + db
+                msg: 'backups send to digital ocean for ' + name + ' and ' + dated_name
             };
         });
     }
-    // async config() {
-    //     return {
-    //         'LIVE' : await this.redis.read('live_db'),
-    //         'STAGING' : await this.redis.read('staging_db'),
-    //         'DEV' : await this.redis.read('dev_db'),
-    //         'NEW' : await this.redis.read('new_db'),
-    //     }
-    // }
-    // async setDb(name: string, db: string) {
-    //     await this.redis.write(name, db);
-    //     return await this.config();
-    // }
     prepare(db) {
         return __awaiter(this, void 0, void 0, function* () {
-            this.redis.write('new_db', db);
-            return yield this.update(db);
         });
     }
     import() {
@@ -99,7 +94,7 @@ class DbController {
     }
     upgrade(new_db, destination) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.postgres.dump(new_db, "switch");
+            yield this.postgres.dump(new_db, "switch_dump");
             yield this.postgres.disconnect(destination);
             yield this.postgres.drop(destination);
             yield this.postgres.create(destination);

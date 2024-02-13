@@ -15038,18 +15038,23 @@ var DockerService = class {
 
 // build/cli.js
 var docker = new DockerService();
-yargs_default(hideBin(process.argv)).command("db:prepare [db]", "prepare database for data entry", (yargs) => {
+yargs_default(hideBin(process.argv)).command("db:backup [db]", "backup database to the spaces bucket in digital ocean", (yargs) => {
+  return yargs.option("db", {
+    describe: "optional name of the database. leave empty when backing up public/live db",
+    default: "public"
+  }).option("name", {
+    describe: "optional name of the backup default is img-backup-latest",
+    default: "img-backup-latest"
+  });
+}, async (argv) => {
+  const res = await node("backup", { db: argv.db, name: argv.name });
+  process.stdout.write(JSON.stringify(res) + "\n");
+}).command("db:prepare [db]", "prepare database for data entry", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"
   });
 }, async (argv) => {
-  const dbConfig = await node("db", { name: "new_db", db: argv.db });
-  const res = await node("update", { db: argv.db });
-  process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:publish [db]", "promote staging database to public", (yargs) => {
-  return yargs;
-}, async (argv) => {
-  const res = await node("publish", {});
+  const res = await node("prepare", { db: argv.db });
   process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:stage [db]", "connect staging dashboard to this database", (yargs) => {
   return yargs.positional("db", {
@@ -15058,21 +15063,17 @@ yargs_default(hideBin(process.argv)).command("db:prepare [db]", "prepare databas
 }, async (argv) => {
   const res = await node("stage", { db: argv.db });
   process.stdout.write(JSON.stringify(res) + "\n");
+}).command("db:publish [db]", "promote staging database to public", (yargs) => {
+  return yargs;
+}, async (argv) => {
+  const res = await node("publish", {});
+  process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:dev [db]", "connect dev dashboard to this database", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"
   });
 }, async (argv) => {
   const res = await node("dev", { db: argv.db });
-  process.stdout.write(JSON.stringify(res) + "\n");
-}).command("db:backup [db] [name]", "backup database to the spaces bucket in digital ocean", (yargs) => {
-  return yargs.positional("db", {
-    describe: "the name of the database, for example img1"
-  }).positional("name", {
-    describe: "type of backup: live db, work in progress, etc ... "
-  });
-}, async (argv) => {
-  const res = await node("backup", { db: argv.db, name: argv.name });
   process.stdout.write(JSON.stringify(res) + "\n");
 }).command("data:entry [week]", "import data from csv", (yargs) => {
   return yargs.positional("week", {

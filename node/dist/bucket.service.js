@@ -84,13 +84,13 @@ class BucketService {
             // return await xlsx.parse(file.Body);
         });
     }
-    writeFile(fileStream, name, db) {
+    writeFile(fileStream, name) {
         return __awaiter(this, void 0, void 0, function* () {
             //  const fileStream = fs.createReadStream(file);
             const input = {
                 Body: fileStream,
                 Bucket: "img-dashboard-backups",
-                Key: "dbs/" + db + "-" + name + ".sql"
+                Key: "dbs/" + name + ".sql"
             };
             return yield this.client.send(new client_s3_1.PutObjectCommand(input));
         });

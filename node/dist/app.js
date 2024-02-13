@@ -33,7 +33,7 @@ app.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 // select inactive db and update db from latest backup
 app.post('/prepare', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.prepare(req.body.db));
+    res.send(yield db.create(req.body.db));
 }));
 // import data ...... ????????
 app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

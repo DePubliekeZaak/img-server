@@ -9,7 +9,7 @@ export interface IBucketService {
     fetchBackup: () => void;
     readFile: (fileName: string) => Promise<any>
     readXlxs: (fileName: string) => Promise<any>
-    writeFile: (fileStream: any, name: string, db: string) => Promise<any>
+    writeFile: (fileStream: any, name: string) => Promise<any>
 }
 
 
@@ -70,14 +70,14 @@ export class BucketService implements IBucketService {
       // return await xlsx.parse(file.Body);
     }
 
-    async writeFile(fileStream: any, name: string, db: string ) {
+    async writeFile(fileStream: any, name: string) {
 
     //  const fileStream = fs.createReadStream(file);
 
       const input = {
         Body: fileStream,
         Bucket: "img-dashboard-backups",
-        Key: "dbs/" + db + "-" + name + ".sql"
+        Key: "dbs/" + name + ".sql"
       };
 
       return await this.client.send(new PutObjectCommand(input));
