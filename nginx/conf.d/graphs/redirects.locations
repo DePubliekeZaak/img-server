@@ -1,4 +1,0 @@
-  # Custom Redirects
- # rewrite ^/graph-selector/bundle.js$ /production/scripts/bundle.js permanent;
- # rewrite ^/graph-selector/json/img_single_graphs.json$ /production/json/img-graph-presets.json permanent;
-

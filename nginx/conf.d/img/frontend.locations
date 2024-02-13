@@ -1,4 +1,4 @@
-    location /staging/ {
+    location /frontend/staging/ {
 	  
         alias /var/www/html/staging/;
     
@@ -12,7 +12,7 @@
         }
     }
 
-    location /dev/ {
+    location /frontend/dev/ {
 	  
         alias /var/www/html/dev/;
     
@@ -27,14 +27,25 @@
     }
 
     location /graphs/ {
-        
+
         alias /var/www/html/production/;
+
         location ~* \.(js|css)$ {
             try_files $uri /dev/null =404;
+            add_header Cache-Control "private";
+		    etag on;
         }
+
         location ~* \.(eot|otf|ttf|woff|woff2)$ {
             add_header Access-Control-Allow-Origin *;
             expires max; 
         }
+        
+        location ~* \.(geojson|topojson)$ {
+            add_header 'Access-Control-Allow-Origin' '*';
+            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+        }
     }
+
+	
     
