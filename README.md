@@ -60,7 +60,7 @@ Commands:
 files must be uploaded to folder on cloud 
 
 For week 1 of the year 2024
- 
+ ```
 img db:backup // create a backup of the current live/public db 
 img db:prepare img_2401 // create a new db from the backup 
 img data:entry 1 --topic fs --db img_2401  // import data from fs.csv
@@ -71,4 +71,5 @@ docker logs node // check results
 img db:stage img_2401 -- connect staging dashboard to this database
 https://img.publikaan.nl/frontend/staging/dashboard.html -- check graphs for strange/incorrect data entries 
 img db:publish 
+```
 
