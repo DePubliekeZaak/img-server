@@ -27,13 +27,12 @@
     }
 
     location /graphs/ {
+
         alias /var/www/html/production/;
+       
         location ~* \.(js|css)$ {
             try_files $uri /dev/null =404;
         }
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
+  
     }
     

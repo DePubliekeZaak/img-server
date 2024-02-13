@@ -1,4 +1,4 @@
-    location /staging/ {
+    location /frontend/staging/ {
 	  
         alias /var/www/html/staging/;
     
@@ -12,7 +12,7 @@
         }
     }
 
-    location /dev/ {
+    location /frontend/dev/ {
 	  
         alias /var/www/html/dev/;
     
@@ -36,4 +36,14 @@
             expires max; 
         }
     }
+
+    location ~* \.(js|css)$ {
+                add_header Cache-Control "private";
+		etag on;
+        }
+
+	location ~* \.(geojson|topojson)$ {
+		add_header 'Access-Control-Allow-Origin' '*';
+		add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+	}
     
