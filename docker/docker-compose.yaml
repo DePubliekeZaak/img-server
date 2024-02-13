@@ -11,6 +11,8 @@ services:
     volumes:
       - letsencrypt:/etc/letsencrypt
       - /var/log/nginx:/var/log/nginx
+      - /srv/img-server/nginx/conf.d/img:/etc/nginx/conf.d/img
+      - /srv/img-server/nginx/conf.d/graphs:/etc/nginx/conf.d/graphs
       - /var/www/html:/var/www/html
     environment:
       - DOMAIN=${DOMAIN}
