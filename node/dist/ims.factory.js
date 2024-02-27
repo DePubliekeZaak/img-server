@@ -7,11 +7,7 @@ exports.parseIms = void 0;
 const node_xlsx_1 = __importDefault(require("node-xlsx"));
 const date_factory_1 = require("./date.factory");
 const rowByDesc = (rows, desc) => {
-    const row = rows.find(r => r[0] == desc);
-    if (row === undefined) {
-        console.log("error at " + desc);
-    }
-    return row;
+    return rows.filter(r => r[0] == desc);
 };
 const removePercentage = (s) => {
     s = (parseFloat(s) * 100).toString();
@@ -28,17 +24,17 @@ const parseIms = (data, date, week) => {
     const column = rows[0].indexOf("Week " + (week).toString());
     console.log(column);
     object["pc4"] = "-";
-    object["ingediend"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[column]);
-    object["uniekeadressenims"] = parseInt(rowByDesc(rows, 'Unieke adressen')[column]);
-    object["totaalbesloten"] = parseInt(rowByDesc(rows, 'Totaal besluiten')[column]);
-    object["toegewezen"] = parseInt(rowByDesc(rows, 'Totaal toegewezen besluiten')[column]);
-    object["afgewezen"] = parseInt(rowByDesc(rows, 'Totaal afgewezen besluiten')[column]);
-    object["totaalverleend"] = parseInt(rowByDesc(rows, 'Uitgekeerde bedrag')[column]);
-    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows, 'Totaal ingediende bezwaren')[column]);
-    object["bezwaren_openstaand"] = parseInt(rowByDesc(rows, 'Totaal openstaande bezwaren')[column]);
-    object["bezwaarpercentage"] = removePercentage(rowByDesc(rows, 'Totaal bezwaarpercentage')[column]);
-    object["bezwaren_beschikt"] = parseInt(rowByDesc(rows, 'Totaal beschikte bezwaren')[column]);
-    object["bezwaren_ingetrokken"] = parseInt(rowByDesc(rows, 'Totaal ingetrokken bezwaren')[column]);
+    object["ingediend"] = parseInt(rowByDesc(rows, 'Totaal ingediende aanvragen')[0][column]);
+    object["uniekeadressenims"] = parseInt(rowByDesc(rows, 'Unieke adressen')[0][column]);
+    object["totaalbesloten"] = parseInt(rowByDesc(rows, 'Totaal besluiten')[0][column]);
+    object["toegewezen"] = parseInt(rowByDesc(rows, 'Totaal toegewezen besluiten')[0][column]);
+    object["afgewezen"] = parseInt(rowByDesc(rows, 'Totaal afgewezen besluiten')[0][column]);
+    object["totaalverleend"] = parseInt(rowByDesc(rows, 'Besloten bedrag')[3][column]);
+    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows, 'Totaal ingediende bezwaren')[0][column]);
+    object["bezwaren_openstaand"] = parseInt(rowByDesc(rows, 'Totaal openstaande bezwaren')[0][column]);
+    object["bezwaarpercentage"] = removePercentage(rowByDesc(rows, 'Totaal bezwaarpercentage')[0][column]);
+    object["bezwaren_beschikt"] = parseInt(rowByDesc(rows, 'Totaal beschikte bezwaren')[0][column]);
+    object["bezwaren_ingetrokken"] = parseInt(rowByDesc(rows, 'Totaal ingetrokken bezwaren')[0][column]);
     console.log(object);
     return object;
 };
