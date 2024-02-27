@@ -1,2 +1,2 @@
 npm run build
-scp dist/* img3:/srv/img-server/node/dist/
+scp dist/* img:/srv/img-server/node/dist/

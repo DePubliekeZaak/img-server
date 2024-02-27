@@ -36,8 +36,8 @@ export const parseIms = (data: any, date: Date, week: number) => {
     object["totaalbesloten"] = parseInt(rowByDesc(rows,'Totaal besluiten')[0][column]);
     object["toegewezen"] = parseInt(rowByDesc(rows,'Totaal toegewezen besluiten')[0][column]);
     object["afgewezen"] = parseInt(rowByDesc(rows,'Totaal afgewezen besluiten')[0][column]);
-    object["totaalverleend"] = parseInt(rowByDesc(rows,'Besloten bedrag')[3][column]);
-    
+    object["totaalverleend"] = parseInt(rowByDesc(rows,'Besloten bedrag')[0][column]);
+
     object["bezwaren_ingediend"] = parseInt(rowByDesc(rows,'Totaal ingediende bezwaren')[0][column]);
     object["bezwaren_openstaand"] = parseInt(rowByDesc(rows,'Totaal openstaande bezwaren')[0][column]);
     object["bezwaarpercentage"] = removePercentage(rowByDesc(rows,'Totaal bezwaarpercentage')[0][column]);
