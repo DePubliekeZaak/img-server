@@ -28,14 +28,14 @@ const parseWd = (data, date, week) => {
     object["aanvragers"] = parseInt(rowByDesc(rows, 'Unieke aanvragers')[0][column]);
     object["afgehandeld"] = parseInt(rowByDesc(rows, 'Totaal beschikkingen')[0][column]);
     object["adressen"] = parseInt(rowByDesc(rows, 'Unieke adressen')[1][column]);
-    object["totaal_verleend"] = parseInt(rowByDesc(rows, 'Besloten bedrag')[0][column]);
+    object["totaal_verleend"] = parseInt(rowByDesc(rows, 'Besloten bedrag')[3][column]);
     object["toegekend"] = 0;
     object["afgewezen"] = parseInt(rowByDesc(rows, 'Afgewezen beschikkingen')[0][column]);
     object["bezwaren_afgehandeld"] = parseInt(rowByDesc(rows, 'Afgehandelde bezwaren')[0][column]);
     object["bezwaren_openstaand"] = parseInt(rowByDesc(rows, 'Niet-afgehandelde bezwaren (totaal)')[0][column]);
     object["bezwaarpercentage"] = removePercentage(rowByDesc(rows, 'Ingediende bezwaren')[1][column]);
     object["bezwaren_in_afwachting"] = parseInt(rowByDesc(rows, 'Niet-afgehandelde bezwaren (totaal)')[0][column]);
-    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows, 'Ingediende bezwaren')[0][column]);
+    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows, 'Ingediende bezwaren')[2][column]);
     console.log(object);
     return object;
 };
