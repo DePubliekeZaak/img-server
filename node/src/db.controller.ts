@@ -6,7 +6,7 @@ import fs from 'fs';
 export interface IDbController {
 
     prepare: (db: string) => void;
-    create: (db: string) => void;
+    create: (db: string, source: string) => void;
     addViewToApi: (view: string, db: string) => void;
 }
 
@@ -39,13 +39,13 @@ export class DbController implements IDbController {
         await this.redis.init();
     }
 
-    async create(db: string) {
+    async create(db: string, source: string) {
      
 
         try {
             await this.postgres.create(db);
             await this.bucket.fetchBackup();
-            await this.postgres.restoreDump(db,"img-backup-latest") 
+            await this.postgres.restoreDump(db, source) 
 
         } catch(err) {
             console.log(err);
@@ -65,7 +65,7 @@ export class DbController implements IDbController {
     async update(db: string) {
 
         await this.drop(db);
-        await this.create(db);
+        await this.create(db,"img-backup-latest");
         return {
             msg : 'copied recent backup to ' + db 
         }
@@ -79,8 +79,6 @@ export class DbController implements IDbController {
         console.log(dated_name);
 
         try {
-
-          
 
             const path = await this.postgres.dump(db,name);
             const fileStream = await fs.createReadStream(path);
@@ -109,13 +107,22 @@ export class DbController implements IDbController {
 
     async upgrade(new_db: string, destination: string) {
 
-        await this.postgres.dump(new_db,"switch_dump");
-        await this.postgres.disconnect(destination);
-        await this.postgres.drop(destination);
-        await this.postgres.create(destination);
-        await this.postgres.restoreDump(destination,"switch_dump")
+        let success = true
 
-        return true;
+        try {
+
+            await this.postgres.dump(new_db,"switch_dump");
+            await this.postgres.disconnect(destination);
+            await this.postgres.drop(destination);
+            await this.postgres.create(destination);
+            await this.postgres.restoreDump(destination,"switch_dump");
+
+        } catch(err) {
+            console.log("failed to upgrade db")
+            success = false; 
+        }
+
+        return success;
     }
 
     async publish() {

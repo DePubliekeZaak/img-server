@@ -15038,7 +15038,7 @@ var DockerService = class {
 
 // build/cli.js
 var docker = new DockerService();
-yargs_default(hideBin(process.argv)).command("db:backup [db]", "backup database to the spaces bucket in digital ocean", (yargs) => {
+yargs_default(hideBin(process.argv)).command("db:backup", "backup database to the spaces bucket in digital ocean", (yargs) => {
   return yargs.option("db", {
     describe: "optional name of the database. leave empty when backing up public/live db",
     default: "public"
@@ -15052,9 +15052,12 @@ yargs_default(hideBin(process.argv)).command("db:backup [db]", "backup database 
 }).command("db:prepare [db]", "prepare database for data entry", (yargs) => {
   return yargs.positional("db", {
     describe: "the name of the database, for example img1"
+  }).option("source", {
+    describe: "the name of the backup used. defaults to img-backup-latest",
+    default: "img-backup-latest"
   });
 }, async (argv) => {
-  const res = await node("prepare", { db: argv.db });
+  const res = await node("prepare", { db: argv.db, source: argv.source });
   process.stdout.write(JSON.stringify(res) + "\n");
 }).command("db:stage [db]", "connect staging dashboard to this database", (yargs) => {
   return yargs.positional("db", {

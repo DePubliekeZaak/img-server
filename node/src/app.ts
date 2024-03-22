@@ -10,7 +10,7 @@ const data = new DataController();
 
 // create new db .. with web_a non role .. and populate with latest backup 
 app.post('/create', async (req, res) => {
-  res.send(await db.create(req.body.db));
+  res.send(await db.create(req.body.db,"img-backup-latest"));
 });
 
 app.post('/drop', async (req, res) => {
@@ -24,7 +24,7 @@ app.post('/update', async (req, res) => {
 
 // select inactive db and update db from latest backup
 app.post('/prepare', async (req, res) => {
-   res.send(await db.create(req.body.db));
+   res.send(await db.create(req.body.db, req.body.source));
 });
 
 // import data ...... ????????

@@ -22,7 +22,7 @@ const db = new db_controller_1.DbController();
 const data = new data_controller_1.DataController();
 // create new db .. with web_a non role .. and populate with latest backup 
 app.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.create(req.body.db));
+    res.send(yield db.create(req.body.db, "img-backup-latest"));
 }));
 app.post('/drop', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.drop(req.body.db));
@@ -33,7 +33,7 @@ app.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
 }));
 // select inactive db and update db from latest backup
 app.post('/prepare', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.send(yield db.create(req.body.db));
+    res.send(yield db.create(req.body.db, req.body.source));
 }));
 // import data ...... ????????
 app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* () {

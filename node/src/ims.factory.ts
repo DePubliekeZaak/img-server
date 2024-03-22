@@ -44,6 +44,26 @@ export const parseIms = (data: any, date: Date, week: number) => {
     object["bezwaren_beschikt"] = parseInt(rowByDesc(rows,'Totaal beschikte bezwaren')[0][column]);
     object["bezwaren_ingetrokken"] = parseInt(rowByDesc(rows,'Totaal ingetrokken bezwaren')[0][column]);
 
+    object["imkj_aanvragen"] = parseInt(rowByDesc(rows,'Aanvragen')[1][column]);
+    object["imkj_voorraad"] = parseInt(rowByDesc(rows,'Voorraad')[0][column]);
+    object["imkj_afgehandeld"] = parseInt(rowByDesc(rows,'Afgehandeld (incl. intrekkingen)')[0][column]);
+    object["imkj_toegekend"] = parseInt(rowByDesc(rows,'Toegekend')[0][column]);
+    object["imkj_afgewezen"] = parseInt(rowByDesc(rows,'Afgewezen')[0][column]);
+    object["imkj_bedrag"] = parseInt(rowByDesc(rows,'Besloten bedrag')[1][column]);
+    object["imkj_bezwaren_ingediend"] = parseInt(rowByDesc(rows,'Ingediende bezwaren')[0][column]);
+    object["imkj_bezwaren_openstaand"] = parseInt(rowByDesc(rows,'Openstaande bezwaren')[0][column]);
+    object["imkj_bezwaren_afgerond"] = parseInt(rowByDesc(rows,'Afgeronde bezwaren (incl. intrekkingen)')[0][column]);
+
+    object["imsc_zaken"] = parseInt(rowByDesc(rows,'IMSC zaken')[1][column]);
+    object["imsc_voorraad"] = parseInt(rowByDesc(rows,'Voorraad')[1][column]);
+    object["imsc_afgehandeld"] = parseInt(rowByDesc(rows,'Afgehandeld (incl. intrekkingen)')[1][column]);
+    object["imsc_verstuurd_besluit"] = parseInt(rowByDesc(rows,'Verstuurd besluit')[0][column]);
+    object["imsc_geannuleerd"] = parseInt(rowByDesc(rows,'Geannuleerd')[0][column]);
+    object["imsc_besloten_bedrag"] = parseInt(rowByDesc(rows,'Besloten bedrag')[2][column]);
+    object["imsc_ingediende_bezwaren"] = parseInt(rowByDesc(rows,'Ingediende bezwaren')[1][column]);
+    object["imsc_openstaande_bezwaren"] = parseInt(rowByDesc(rows,'Openstaande bezwaren')[2][column]);
+    object["imsc_afgeronde_bezwaren"] = parseInt(rowByDesc(rows,'Afgeronde bezwaren (incl. intrekkingen)')[1][column]);
+
     console.log(object);
 
     return object;

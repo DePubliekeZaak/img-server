@@ -8,8 +8,8 @@
     "build": "npx tsc",
     "bundle": "npx esbuild ./build/cli.js  --bundle --outfile=img-cli.cjs --format=cjs --platform=node",
     "package": "pkg img-cli.cjs --targets node16-linux-x64 --output img",
-    "copy": "scp img img3:/srv/img-server/",
-    "cli" : "npx tsc && npx esbuild ./build/cli.js  --bundle --outfile=img-cli.cjs --format=cjs --platform=node && pkg img-cli.cjs --targets node16-linux-x64 --output img && scp img img3:/srv/img-server/" 
+    "copy": "scp img img:/srv/img-server/",
+    "cli" : "npx tsc && npx esbuild ./build/cli.js  --bundle --outfile=img-cli.cjs --format=cjs --platform=node && pkg img-cli.cjs --targets node16-linux-x64 --output img && scp img img:/srv/img-server/" 
   },
   "author": "",
   "license": "ISC",

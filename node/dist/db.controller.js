@@ -33,12 +33,12 @@ class DbController {
             yield this.redis.init();
         });
     }
-    create(db) {
+    create(db, source) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.postgres.create(db);
                 yield this.bucket.fetchBackup();
-                yield this.postgres.restoreDump(db, "img-backup-latest");
+                yield this.postgres.restoreDump(db, source);
             }
             catch (err) {
                 console.log(err);
@@ -58,7 +58,7 @@ class DbController {
     update(db) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.drop(db);
-            yield this.create(db);
+            yield this.create(db, "img-backup-latest");
             return {
                 msg: 'copied recent backup to ' + db
             };
@@ -94,12 +94,19 @@ class DbController {
     }
     upgrade(new_db, destination) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.postgres.dump(new_db, "switch_dump");
-            yield this.postgres.disconnect(destination);
-            yield this.postgres.drop(destination);
-            yield this.postgres.create(destination);
-            yield this.postgres.restoreDump(destination, "switch_dump");
-            return true;
+            let success = true;
+            try {
+                yield this.postgres.dump(new_db, "switch_dump");
+                yield this.postgres.disconnect(destination);
+                yield this.postgres.drop(destination);
+                yield this.postgres.create(destination);
+                yield this.postgres.restoreDump(destination, "switch_dump");
+            }
+            catch (err) {
+                console.log("failed to upgrade db");
+                success = false;
+            }
+            return success;
         });
     }
     publish() {

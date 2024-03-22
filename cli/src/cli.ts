@@ -9,7 +9,7 @@ const docker: IDockerService = new DockerService();
 
 yargs(hideBin(process.argv))
   .command(
-    'db:backup [db]',
+    'db:backup',
     'backup database to the spaces bucket in digital ocean',
     (yargs) => {
         return yargs
@@ -36,10 +36,14 @@ yargs(hideBin(process.argv))
         .positional('db', {
             describe: 'the name of the database, for example img1'
         })
+        .option('source', {
+          describe: 'the name of the backup used. defaults to img-backup-latest',
+          default: 'img-backup-latest'
+      })
     },
     async (argv) => { 
 
-        const res = await node('prepare',{ db: argv.db });
+        const res = await node('prepare',{ db: argv.db, source: argv.source });
         process.stdout.write(JSON.stringify(res) + '\n');
     }
   )
