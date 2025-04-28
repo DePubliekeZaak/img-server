@@ -54,9 +54,12 @@ app.post('/publish', async (req, res) => {
 
 app.post('/data_entry', async (req, res) => {
 
+  console.log(req.body);
+
   if (req.body.topic == 'all') {
     res.send(await data.all(req.body.week, req.body.db));
   } else if (req.body.topic == 'gemeenten') {
+    console.log('hallo');
     res.send(await data.entry2(req.body.week, req.body.topic, req.body.db));
   } else {
     res.send(await data.entry(req.body.week, req.body.topic, req.body.db));

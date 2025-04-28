@@ -48,15 +48,16 @@ class DataController {
             const year = jaar_week.split("/")[0];
             const week = jaar_week.split("/")[1];
             let data;
+            console.log(year + week);
             switch (topic) {
                 case 'gemeenten':
-                    data = yield this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
-                    data = (0, csv_factory_1.csvToArray)(data, ",");
-                    // data = cleanVes(data);
-                    for (let row of data) {
-                        console.log(row);
-                        let reso = yield this.postgres.insert(row, 'gemeenten', db, "db2");
-                    }
+                    // data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                    // data = csvToArray(data,",");
+                    // // data = cleanVes(data);
+                    // for (let row of data) {
+                    //     console.log(row);
+                    //     // let reso = await this.postgres.insert(row,'gemeenten', db,"db2");
+                    // }
                     break;
             }
         });

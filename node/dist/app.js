@@ -55,10 +55,12 @@ app.post('/publish', (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.send(yield db.upgrade("staging", "public"));
 }));
 app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.body);
     if (req.body.topic == 'all') {
         res.send(yield data.all(req.body.week, req.body.db));
     }
     else if (req.body.topic == 'gemeenten') {
+        console.log('hallo');
         res.send(yield data.entry2(req.body.week, req.body.topic, req.body.db));
     }
     else {

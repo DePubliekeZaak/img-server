@@ -51,16 +51,18 @@ export class DataController implements IDataController {
 
         let data: any;
 
+        console.log(year + week);
+
         switch (topic) {
 
             case 'gemeenten': 
-                data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
-                data = csvToArray(data,",");
-                // data = cleanVes(data);
-                for (let row of data) {
-                    console.log(row);
-                    let reso = await this.postgres.insert(row,'gemeenten', db,"db2");
-                }
+                // data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                // data = csvToArray(data,",");
+                // // data = cleanVes(data);
+                // for (let row of data) {
+                //     console.log(row);
+                //     // let reso = await this.postgres.insert(row,'gemeenten', db,"db2");
+                // }
                 break;
         }
     }
