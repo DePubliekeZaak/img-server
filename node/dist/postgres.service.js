@@ -45,12 +45,12 @@ class PostgresService {
             return yield this.runPsql(cmd, db);
         });
     }
-    insert(data, table, db) {
+    insert(data, table, db, instance = 'db1') {
         return __awaiter(this, void 0, void 0, function* () {
             function joinValues(data) {
                 let string = "";
                 for (const [key, value] of Object.entries(data)) {
-                    if (['gemeente', "datum", "pc4"].indexOf(key) > -1) {
+                    if (['gemeente', "datum", "pc4", "jaar_week", "datum_maandag", "domein_code", "regeling_code", "zaaktype"].indexOf(key) > -1) {
                         string = string.concat("'" + value + "'");
                     }
                     else {
@@ -65,6 +65,38 @@ class PostgresService {
             VALUES (` + joinValues(data) + `);
         `;
             // console.log(cmd);
+            return yield this.runPsql(cmd, db, instance);
+        });
+    }
+    update(data, table, key, db) {
+        return __awaiter(this, void 0, void 0, function* () {
+            function joinValues(data) {
+                let string = "";
+                for (const [key, value] of Object.entries(data)) {
+                    if (['gemeente', "datum", "pc4"].indexOf(key) > -1) {
+                        string = string.concat("'" + value + "'");
+                    }
+                    else {
+                        string = string.concat(String(value));
+                    }
+                    string = string.concat(",");
+                }
+                return string.slice(0, -1);
+            }
+            let string = "";
+            for (let d of data) {
+                if (!isNaN(d.value) && d.value != null) {
+                    string = string.concat(`WHEN datum = '${d.date}' THEN ${Math.round(d.value * 1000000)} \n`);
+                }
+            }
+            const vs = data.map(d => { return `'` + d.date + `'`; }).join(',');
+            const cmd = `
+            UPDATE main.${table} 
+            SET sum_verleend = CASE
+            ${string}END
+            WHERE datum IN (${vs});
+        `;
+            console.log(cmd);
             return yield this.runPsql(cmd, db);
         });
     }
@@ -124,14 +156,14 @@ class PostgresService {
             return yield this.childProcess(bin, args);
         });
     }
-    runPsql(cmd, db) {
+    runPsql(cmd, db, instance = 'db1') {
         return __awaiter(this, void 0, void 0, function* () {
             let success = false;
             const bin = "psql";
             try {
                 let args = [
                     "--host",
-                    "db1",
+                    instance,
                     "--username",
                     "postgres",
                 ];

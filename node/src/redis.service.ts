@@ -26,7 +26,7 @@ export class RedisService implements IRedisService {
             }
         })
 
-        await this.client.connect()
+        // await this.client.connect()
     }
 
     async read(key: string) {

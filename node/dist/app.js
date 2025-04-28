@@ -58,12 +58,20 @@ app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function
     if (req.body.topic == 'all') {
         res.send(yield data.all(req.body.week, req.body.db));
     }
+    else if (req.body.topic == 'gemeenten') {
+        res.send(yield data.entry2(req.body.week, req.body.topic, req.body.db));
+    }
     else {
         res.send(yield data.entry(req.body.week, req.body.topic, req.body.db));
     }
 }));
 app.post('/api_view', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.addViewToApi(req.body.name, req.body.db));
+}));
+app.post('/import_history', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const db = "img_2434";
+    const key = "VES_toegekend_2a+b_(in miljoen)";
+    res.send(yield data.importHistory(db, key));
 }));
 app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);

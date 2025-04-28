@@ -44,7 +44,7 @@ export class DbController implements IDbController {
 
         try {
             await this.postgres.create(db);
-            await this.bucket.fetchBackup();
+            await this.bucket.fetchBackup(source);
             await this.postgres.restoreDump(db, source) 
 
         } catch(err) {

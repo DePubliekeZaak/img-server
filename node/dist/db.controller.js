@@ -37,7 +37,7 @@ class DbController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.postgres.create(db);
-                yield this.bucket.fetchBackup();
+                yield this.bucket.fetchBackup(source);
                 yield this.postgres.restoreDump(db, source);
             }
             catch (err) {

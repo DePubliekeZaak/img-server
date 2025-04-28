@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx nodemon src/app.ts",
     "build": "npx tsc",
-    "deploy": "cd dist && git add . && git commit -am 'automated' && git push img master && cd .."
+    "deploy": "npx tsc && cd dist && git add . && git commit -am 'automated' && git push img master && cd .."
   },
   "keywords": [],
   "author": "",

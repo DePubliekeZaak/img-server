@@ -80,10 +80,36 @@ export const parseKto = (data: any, date: Date) => {
 
                 break;
 
+            case 45:
+            case 46:
+            case 47:
+            case 48:
+            case 49:
+            case 50:
+            case 51:
+            case 52:
+            case 53:
+            case 54:
+          
+                object["imkj_doorlopend_" + row[1]] = parseInt(row[6]);
+                object["imkj_maand_" + row[1]] = parseInt(row[2]);
+
+                break;
+
+            case 55:
+
+                object["imkj_maand_gem"]  = parseFloat(row[1]) || 0;
+                object["imkj_maand_n"] = parseInt(row[2]);
+                object["imkj_doorlopend_gem"]  = parseFloat(row[5]);
+                object["imkj_doorlopend_n"] = parseInt(row[6]);
+            
+                break;
 
         }
 
     });
+
+    console.log(object);
 
     return object;
 }

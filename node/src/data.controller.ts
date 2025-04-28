@@ -10,6 +10,7 @@ import { parseIms } from "./ims.factory";
 import { cleanFs} from "./fs.factory";
 import { cleanVes } from "./ves.factory";
 import { mondayFromWeek, nextMondayFromWeek } from "./date.factory";
+import { parseHistory } from "./history.factory";
 
 export interface IDataController {
 
@@ -31,17 +32,48 @@ export class DataController implements IDataController {
     }
 
     async init() {
-        await this.redis.init();
+       // await this.redis.init();
+    }
+
+
+    async importHistory(db: string, key: string) {
+
+        let data = await this.bucket.readXlxs('historie/Communicatierapportage_D&I_FS.xlsx');
+        data = parseHistory(data, key);
+        let res1 = await this.postgres.update(data,'ves', key, db);
+        return 'ok\n';
+    }
+
+    async entry2(jaar_week: string, topic: string, db: string, archive: boolean = false) {
+
+        const year = jaar_week.split("/")[0];
+        const week = jaar_week.split("/")[1];
+
+        let data: any;
+
+        switch (topic) {
+
+            case 'gemeenten': 
+                data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                data = csvToArray(data,",");
+                // data = cleanVes(data);
+                for (let row of data) {
+                    console.log(row);
+                    let reso = await this.postgres.insert(row,'gemeenten', db,"db2");
+                }
+                break;
+        }
     }
 
     async entry(week: string, topic: string, db: string) {
     
         try {
 
-            const year = 2024;
+            const year = 2025;
             let data: any;
             let date: Date;
             console.log('starting data entry for ' + topic);
+            console.log('week: ' + week);
 
             switch (topic) {
 
@@ -52,7 +84,7 @@ export class DataController implements IDataController {
                     data = cleanVes(data,date);
                     for (let row of data) {
                         // console.log(row);
-                        let reso = await this.postgres.insert(row,'vaste_vergoeding',db);
+                        let reso = await this.postgres.insert(row,'ves', db, "db1");
                     }
                     break;
 
@@ -64,9 +96,8 @@ export class DataController implements IDataController {
                     data = cleanFs(data);
                     for (let row of data) {
                         // console.log(row);
-                        let reso = await this.postgres.insert(row,'fysieke_schade',db);
+                        let reso = await this.postgres.insert(row,'fysieke_schade', db, "db1");
                     }
-
                     break;
 
                 case 'mms': 
@@ -81,7 +112,7 @@ export class DataController implements IDataController {
                     data = await this.bucket.readXlxs(year + '/' + week + '/kto.xlsx');
                     date = nextMondayFromWeek(week, year);// from fileName ? 
                     data = parseKto(data,date);
-                    let res = await this.postgres.insert(data,'tevredenheidscijfers',db);
+                    let res = await this.postgres.insert(data,'tevredenheidscijfers', db, "db1");
                     break;
 
                 case 'wdims':
@@ -92,21 +123,24 @@ export class DataController implements IDataController {
   
                     const imsData = parseIms(data,date,parseInt(week));
                     const wdData = parseWd(data,date,parseInt(week));
-                    let res1 = await this.postgres.insert(imsData,'immateriele_schade', db);
-                    let res2 = await this.postgres.insert(wdData,'waardedalingsregeling',db);
+                    let res1 = await this.postgres.insert(imsData,'immateriele_schade', db, "db1");
+                    let res2 = await this.postgres.insert(wdData,'waardedalingsregeling', db, "db1");
                     break;
             }
 
-            
+            return {
+                msg : "data entry completed successfull" 
+            }
+       
 
         } catch(err) {
 
-            console.log(err)
-        }
-        return {
-            msg : "data entry completed successfull" 
+            return {
+                err 
+            }
         }
     }
+        
 
     async all(week: string, db: string) {
         

@@ -22,6 +22,7 @@ const ims_factory_1 = require("./ims.factory");
 const fs_factory_1 = require("./fs.factory");
 const ves_factory_1 = require("./ves.factory");
 const date_factory_1 = require("./date.factory");
+const history_factory_1 = require("./history.factory");
 class DataController {
     constructor() {
         this.bucket = new bucket_service_1.BucketService();
@@ -31,16 +32,43 @@ class DataController {
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.redis.init();
+            // await this.redis.init();
+        });
+    }
+    importHistory(db, key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = yield this.bucket.readXlxs('historie/Communicatierapportage_D&I_FS.xlsx');
+            data = (0, history_factory_1.parseHistory)(data, key);
+            let res1 = yield this.postgres.update(data, 'ves', key, db);
+            return 'ok\n';
+        });
+    }
+    entry2(jaar_week, topic, db, archive = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const year = jaar_week.split("/")[0];
+            const week = jaar_week.split("/")[1];
+            let data;
+            switch (topic) {
+                case 'gemeenten':
+                    data = yield this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                    data = (0, csv_factory_1.csvToArray)(data, ",");
+                    // data = cleanVes(data);
+                    for (let row of data) {
+                        console.log(row);
+                        let reso = yield this.postgres.insert(row, 'gemeenten', db, "db2");
+                    }
+                    break;
+            }
         });
     }
     entry(week, topic, db) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const year = 2024;
+                const year = 2025;
                 let data;
                 let date;
                 console.log('starting data entry for ' + topic);
+                console.log('week: ' + week);
                 switch (topic) {
                     case 'ves':
                         data = yield this.bucket.readFile(year + '/' + week + '/ves.csv');
@@ -48,7 +76,7 @@ class DataController {
                         data = (0, ves_factory_1.cleanVes)(data, date);
                         for (let row of data) {
                             // console.log(row);
-                            let reso = yield this.postgres.insert(row, 'vaste_vergoeding', db);
+                            let reso = yield this.postgres.insert(row, 'ves', db, "db1");
                         }
                         break;
                     case 'fs':
@@ -57,7 +85,7 @@ class DataController {
                         data = (0, fs_factory_1.cleanFs)(data);
                         for (let row of data) {
                             // console.log(row);
-                            let reso = yield this.postgres.insert(row, 'fysieke_schade', db);
+                            let reso = yield this.postgres.insert(row, 'fysieke_schade', db, "db1");
                         }
                         break;
                     case 'mms':
@@ -71,24 +99,26 @@ class DataController {
                         data = yield this.bucket.readXlxs(year + '/' + week + '/kto.xlsx');
                         date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ? 
                         data = (0, kto_factory_1.parseKto)(data, date);
-                        let res = yield this.postgres.insert(data, 'tevredenheidscijfers', db);
+                        let res = yield this.postgres.insert(data, 'tevredenheidscijfers', db, "db1");
                         break;
                     case 'wdims':
                         data = yield this.bucket.readXlxs(year + '/' + week + '/wdims.xlsx');
                         date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ? 
                         const imsData = (0, ims_factory_1.parseIms)(data, date, parseInt(week));
                         const wdData = (0, wd_factory_1.parseWd)(data, date, parseInt(week));
-                        let res1 = yield this.postgres.insert(imsData, 'immateriele_schade', db);
-                        let res2 = yield this.postgres.insert(wdData, 'waardedalingsregeling', db);
+                        let res1 = yield this.postgres.insert(imsData, 'immateriele_schade', db, "db1");
+                        let res2 = yield this.postgres.insert(wdData, 'waardedalingsregeling', db, "db1");
                         break;
                 }
+                return {
+                    msg: "data entry completed successfull"
+                };
             }
             catch (err) {
-                console.log(err);
+                return {
+                    err
+                };
             }
-            return {
-                msg: "data entry completed successfull"
-            };
         });
     }
     all(week, db) {

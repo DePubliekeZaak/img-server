@@ -52,15 +52,15 @@ class BucketService {
             }
         });
     }
-    fetchBackup() {
+    fetchBackup(source = 'img-backup-latest') {
         return __awaiter(this, void 0, void 0, function* () {
             const bucketParams = {
                 Bucket: "img-dashboard-backups",
-                Key: "dbs/img-backup-latest.sql"
+                Key: `dbs/${source}.sql`
             };
             const response = yield this.client.send(new client_s3_1.GetObjectCommand(bucketParams));
             let data = yield this._streamToString(response.Body);
-            (0, fs_1.writeFileSync)("/tmp/img-backup-latest.sql", data);
+            (0, fs_1.writeFileSync)(`/tmp/${source}.sql`, data);
         });
     }
     readFile(fileName) {

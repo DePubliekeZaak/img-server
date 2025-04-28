@@ -47,7 +47,7 @@ class RedisService {
                     port: REDIS_PORT
                 }
             });
-            yield this.client.connect();
+            // await this.client.connect()
         });
     }
     read(key) {

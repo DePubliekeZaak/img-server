@@ -6,7 +6,7 @@ export const cleanVes= (data: any, date: Date) => {
 
     for (let row of data) {
 
-        console.log(row['datum']);
+        // console.log(row['datum']);
 
         if([undefined,'undefined','',null].indexOf(row['datum']) >  -1) {
             break;

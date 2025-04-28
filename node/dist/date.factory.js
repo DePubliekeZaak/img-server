@@ -26,6 +26,7 @@ const mondayFromWeek = (week, year) => {
 exports.mondayFromWeek = mondayFromWeek;
 const nextMondayFromWeek = (week, year) => {
     var simple = new Date(year, 0, 1 + (week) * 7);
+    simple.setHours(simple.getHours() + 2);
     var dow = simple.getDay();
     var ISOweekStart = simple;
     if (dow <= 4)

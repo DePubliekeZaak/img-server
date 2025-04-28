@@ -19,12 +19,10 @@ export const cleanFs = (data: any) => {
             row['Datum'] = a[2] + '-' + addZero(a[1]) + '-' + addZero(a[0])
         }
 
-
         let r: any = {};
 
         for (let [key, value] of Object.entries(row)) {
-
-                r[slugify(key)] = value == '' ? null : value;
+            r[slugify(key)] = value == '' ? null : value;
         }
               
         output.push(r);

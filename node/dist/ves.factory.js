@@ -5,7 +5,7 @@ const format_factory_1 = require("./format.factory");
 const cleanVes = (data, date) => {
     let output = [];
     for (let row of data) {
-        console.log(row['datum']);
+        // console.log(row['datum']);
         if ([undefined, 'undefined', '', null].indexOf(row['datum']) > -1) {
             break;
         }

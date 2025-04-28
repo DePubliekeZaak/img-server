@@ -2,9 +2,9 @@ import xlsx from 'node-xlsx';
 import { formatDate } from './date.factory';
 import { stripCurrency } from './format.factory';
 
-const rowByDesc = (rows: any[], desc: string) =>  {
+const rowByDesc = (rows: any[], namespace, desc: string) =>  {
 
-    return rows.filter( r => r[0] == desc);
+    return rows.find( r => r[0] != undefined && r[1] != undefined && r[0].trim() == namespace && r[1].trim() == desc);
 }
 
 const removePercentage = (s: string) => {
@@ -23,26 +23,20 @@ export const parseWd = (data: any, date: Date, week: number) => {
         gemeente: 'all'
     };
 
-    // console.log(week);
-    // const latestRow = 5;
     const rows = data[0].data;
     const column = rows[0].indexOf("Week " + (week).toString());
 
-    // console.log(rows);
+    object["aanvragen"] = parseInt(rowByDesc(rows,'wd','Totaal ingediende aanvragen')[column]);
+    object["aanvragers"] = parseInt(rowByDesc(rows,'wd','Unieke aanvragers')[column]);
+    object["afgehandeld"] = parseInt(rowByDesc(rows,'wd','Totaal beschikkingen')[column]);
+    object["adressen"] = parseInt(rowByDesc(rows,'wd','Unieke adressen')[column]);
+    object["totaal_verleend"] = parseInt(rowByDesc(rows,'wd','Besloten bedrag')[column]);
+    object["afgewezen"] = parseInt(rowByDesc(rows,'wd','Afgewezen beschikkingen')[column]);
 
-    object["aanvragen"] = parseInt(rowByDesc(rows,'Totaal ingediende aanvragen')[1][column]);
-    object["aanvragers"] = parseInt(rowByDesc(rows,'Unieke aanvragers')[0][column]);
-    object["afgehandeld"] = parseInt(rowByDesc(rows,'Totaal beschikkingen')[0][column]);
-    object["adressen"] = parseInt(rowByDesc(rows,'Unieke adressen')[1][column]);
-    object["totaal_verleend"] = parseInt(rowByDesc(rows,'Besloten bedrag')[3][column]);
-    object["toegekend"] = 0;
-    object["afgewezen"] = parseInt(rowByDesc(rows,'Afgewezen beschikkingen')[0][column]);
-
-    object["bezwaren_afgehandeld"] = parseInt(rowByDesc(rows,'Afgehandelde bezwaren')[0][column]);
-    object["bezwaren_openstaand"] = parseInt(rowByDesc(rows,'Niet-afgehandelde bezwaren (totaal)')[0][column]);
-    object["bezwaarpercentage"] = removePercentage(rowByDesc(rows,'Ingediende bezwaren')[1][column]);
-    object["bezwaren_in_afwachting"] = parseInt(rowByDesc(rows,'Niet-afgehandelde bezwaren (totaal)')[0][column]);
-    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows,'Ingediende bezwaren')[2][column]);
+    object["bezwaren_afgehandeld"] = parseInt(rowByDesc(rows,'wd','Afgehandelde bezwaren')[column]);
+    object["bezwaren_openstaand"] = parseInt(rowByDesc(rows,'wd','Niet-afgehandelde bezwaren (totaal)')[column]);
+    object["bezwaren_in_afwachting"] = parseInt(rowByDesc(rows,'wd','Niet-afgehandelde bezwaren (in afwachting bezwaarschrift)')[column]);
+    object["bezwaren_ingediend"] = parseInt(rowByDesc(rows,'wd','Ingediende bezwaren')[column]);
 
     console.log(object);
 

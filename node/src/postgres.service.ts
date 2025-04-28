@@ -8,7 +8,8 @@ export interface IPostgresService {
     drop: (db: string) => Promise<boolean>;
     create: (db: string) => void;
     createWebAnonRole: (db: string) => void;
-    insert: (data: any, tablke: string, db: string) => Promise<boolean>;
+    insert: (data: any, table: string, db: string, instance: string) => Promise<boolean>;
+    update: (data: any, table: string, key: string, db: string) => Promise<boolean>;
     dump: (db: string, name: string) => Promise<string>;
     importCsv: (db: string, topic: string) => Promise<string>;
     restoreDump: (db: string, name: string) => Promise<string>;
@@ -20,8 +21,7 @@ export class PostgresService {
     config: any = null;
     spawn: any;
 
-    constructor() {
-    }
+    constructor() {}
 
     async addView(view: string, db: string) {
 
@@ -53,7 +53,36 @@ export class PostgresService {
         return await this.runPsql(cmd, db);
     }
 
-    async insert(data: any, table: string, db: string) {
+    async insert(data: any, table: string, db: string, instance: string = 'db1') {
+
+        function joinValues(data: any) {
+
+            let string = "";
+
+            for (const [key, value] of Object.entries(data)) {
+
+                if (['gemeente',"datum","pc4","jaar_week","datum_maandag","domein_code","regeling_code","zaaktype"].indexOf(key) > -1)  {
+                    string = string.concat("'" + value + "'");
+                } else {
+                    string = string.concat(String(value));
+                }
+                string = string.concat(",");
+            }
+
+            return string.slice(0,-1);
+        }
+
+        const cmd = `
+            INSERT INTO main.` + table + `(` + Object.keys(data).join(", ") + `)
+            VALUES (` + joinValues(data) + `);
+        `;
+
+        // console.log(cmd);
+            
+        return await this.runPsql(cmd, db, instance);
+    }
+
+    async update(data: any, table: string, key: string, db: string) {
 
         function joinValues(data) {
 
@@ -72,12 +101,24 @@ export class PostgresService {
             return string.slice(0,-1);
         }
 
+        let string = "";
+        for (let d of data) {
+
+            if (!isNaN(d.value) && d.value != null) {
+                string = string.concat(`WHEN datum = '${d.date}' THEN ${Math.round(d.value * 1000000)} \n`);
+            }
+        }
+ 
+        const vs = data.map(d => { return `'` + d.date + `'` }).join(',');
+
         const cmd = `
-            INSERT INTO main.` + table + `(` + Object.keys(data).join(", ") + `)
-            VALUES (` + joinValues(data) + `);
+            UPDATE main.${table} 
+            SET sum_verleend = CASE
+            ${string}END
+            WHERE datum IN (${vs});
         `;
 
-        // console.log(cmd);
+        console.log(cmd);
             
         return await this.runPsql(cmd, db);
     }
@@ -149,7 +190,7 @@ export class PostgresService {
 
     
 
-    async runPsql(cmd: string, db: string) {
+    async runPsql(cmd: string, db: string, instance: string = 'db1') {
 
         let success = false;
 
@@ -159,7 +200,7 @@ export class PostgresService {
             
             let args = [
                 "--host",
-                "db1",
+                instance,
                 "--username",
                 "postgres",
             ]

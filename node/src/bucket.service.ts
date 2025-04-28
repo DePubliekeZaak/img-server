@@ -6,7 +6,7 @@ dotenv.config()
 
 export interface IBucketService {
 
-    fetchBackup: () => void;
+    fetchBackup: (source: string) => void;
     readFile: (fileName: string) => Promise<any>
     readXlxs: (fileName: string) => Promise<any>
     writeFile: (fileStream: any, name: string) => Promise<any>
@@ -22,6 +22,7 @@ export class BucketService implements IBucketService {
     }
 
     init() {
+
     
     this.client = new S3Client({
         forcePathStyle: false, // Configures to use subdomain/virtual calling format.
@@ -34,16 +35,17 @@ export class BucketService implements IBucketService {
     });
     }
 
-    async fetchBackup() {
+    async fetchBackup(source: string = 'img-backup-latest') {
+
 
       const bucketParams = {
         Bucket: "img-dashboard-backups",
-        Key: "dbs/img-backup-latest.sql"
+        Key: `dbs/${source}.sql`
       };
 
       const response = await this.client.send(new GetObjectCommand(bucketParams));
       let data = await this._streamToString(response.Body);
-      writeFileSync("/tmp/img-backup-latest.sql", data);
+      writeFileSync(`/tmp/${source}.sql`, data);
 
     }
 
