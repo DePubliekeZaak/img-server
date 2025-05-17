@@ -1,5 +1,6 @@
 docker/env.docker
 node/env.node
+node/.env
 node/node_modules
 node/package-lock.json
 cli/node_modules
