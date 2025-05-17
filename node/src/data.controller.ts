@@ -11,6 +11,8 @@ import { cleanFs} from "./fs.factory";
 import { cleanVes } from "./ves.factory";
 import { mondayFromWeek, nextMondayFromWeek } from "./date.factory";
 import { parseHistory } from "./history.factory";
+import { validateCumulativeTotals } from "./validate";
+import { cleanGemeenten, cleanZaaktypes } from "./clean";
 
 export interface IDataController {
 
@@ -46,24 +48,41 @@ export class DataController implements IDataController {
 
     async entry2(jaar_week: string, topic: string, db: string, archive: boolean = false) {
 
-        const year = jaar_week.split("/")[0];
-        const week = jaar_week.split("/")[1];
+        try {
+            
+            const year = jaar_week.split("_")[0];
+            const week = jaar_week.split("_")[1];
 
-        let data: any;
+            let data: any;
 
-        console.log(year + week);
+            console.log(year + week);
 
-        switch (topic) {
+            switch (topic) {
 
-            case 'gemeenten': 
-                // data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
-                // data = csvToArray(data,",");
-                // // data = cleanVes(data);
-                // for (let row of data) {
-                //     console.log(row);
-                //     // let reso = await this.postgres.insert(row,'gemeenten', db,"db2");
-                // }
-                break;
+                case 'gemeenten': 
+                    data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                    data = csvToArray(data,",");
+                    data = cleanGemeenten(data);
+                    await this.postgres.bulkInsert(data, 'gemeenten', db, "db2");
+                    break;
+
+                case 'zaaktypes': 
+                    data = await this.bucket.readFile(year + '/' + week + '/zaaktypes.csv');
+                    data = csvToArray(data,",");
+                    data = cleanZaaktypes(data);
+                    await this.postgres.bulkInsert(data, 'zaaktypes', db, "db2");
+                    break;
+            }
+
+            return {
+                msg : "data entry completed successfull" 
+            }
+
+        } catch(err) {
+
+            return {
+                err 
+            }
         }
     }
 
@@ -84,10 +103,7 @@ export class DataController implements IDataController {
                     data = await this.bucket.readFile(year + '/' + week + '/ves.csv');
                     data = csvToArray(data,",");
                     data = cleanVes(data,date);
-                    for (let row of data) {
-                        // console.log(row);
-                        let reso = await this.postgres.insert(row,'ves', db, "db1");
-                    }
+                    await this.postgres.bulkInsert(data,'ves', db, "db1");
                     break;
 
 
@@ -96,25 +112,23 @@ export class DataController implements IDataController {
                     data = await this.bucket.readFile(year + '/' + week + '/fs.csv');
                     data = csvToArray(data,",");
                     data = cleanFs(data);
-                    for (let row of data) {
-                        // console.log(row);
-                        let reso = await this.postgres.insert(row,'fysieke_schade', db, "db1");
-                    }
+                    await this.postgres.bulkInsert(data,'fysieke_schade', db, "db1");
+                    
                     break;
 
-                case 'mms': 
-                    data = await this.bucket.readFile(year + '/' + week + '/mms.csv');
-                    data = csvToArray(data,";");
-                    data = parseMmsHistory(data);
-                    writeFileSync("/tmp/" + topic + ".csv", arrayToCsv(data));
-                    this.postgres.importCsv(db, topic);
-                    break;
+                // case 'mms': 
+                //     data = await this.bucket.readFile(year + '/' + week + '/mms.csv');
+                //     data = csvToArray(data,";");
+                //     data = parseMmsHistory(data);
+                //     writeFileSync("/tmp/" + topic + ".csv", arrayToCsv(data));
+                //     this.postgres.importCsv(db, topic);
+                //     break;
 
                 case 'kto':
                     data = await this.bucket.readXlxs(year + '/' + week + '/kto.xlsx');
                     date = nextMondayFromWeek(week, year);// from fileName ? 
                     data = parseKto(data,date);
-                    let res = await this.postgres.insert(data,'tevredenheidscijfers', db, "db1");
+                    await this.postgres.bulkInsert([data],'tevredenheidscijfers', db, "db1");
                     break;
 
                 case 'wdims':
@@ -125,8 +139,8 @@ export class DataController implements IDataController {
   
                     const imsData = parseIms(data,date,parseInt(week));
                     const wdData = parseWd(data,date,parseInt(week));
-                    let res1 = await this.postgres.insert(imsData,'immateriele_schade', db, "db1");
-                    let res2 = await this.postgres.insert(wdData,'waardedalingsregeling', db, "db1");
+                    await this.postgres.bulkInsert([imsData],'immateriele_schade', db, "db1");
+                    await this.postgres.bulkInsert([wdData],'waardedalingsregeling', db, "db1");
                     break;
             }
 
@@ -152,6 +166,32 @@ export class DataController implements IDataController {
         await this.entry(week, 'kto', db);
         await this.entry(week, 'wdims', db);
 
+    }
+
+    async validate(jaar_week: string, topic: string) {
+
+        const year = jaar_week.split("_")[0];
+            const week = jaar_week.split("_")[1];
+            let data: any;
+            switch (topic) {
+
+                case 'gemeenten': 
+                    data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                    data = csvToArray(data,",");
+                    data = cleanGemeenten(data);
+                    
+                    break;
+
+                case 'zaaktypes': 
+                    data = await this.bucket.readFile(year + '/' + week + '/zaaktypes.csv');
+                    data = csvToArray(data,",");
+                    data = cleanGemeenten(data);
+                    
+                    break;
+            }
+
+
+            return await validateCumulativeTotals(data);
     }
 
        

@@ -245,8 +245,7 @@ var require_http_cache_semantics = __commonJS({
     }
     function parseCacheControl(header) {
       const cc = {};
-      if (!header)
-        return cc;
+      if (!header) return cc;
       const parts = header.trim().split(/,/);
       for (const part of parts) {
         const [k, v] = part.split(/=/, 2);
@@ -373,16 +372,14 @@ var require_http_cache_semantics = __commonJS({
         }
         const fields = this._resHeaders.vary.trim().toLowerCase().split(/\s*,\s*/);
         for (const name of fields) {
-          if (req.headers[name] !== this._reqHeaders[name])
-            return false;
+          if (req.headers[name] !== this._reqHeaders[name]) return false;
         }
         return true;
       }
       _copyWithoutHopByHopHeaders(inHeaders) {
         const headers = {};
         for (const name in inHeaders) {
-          if (hopByHopHeaders[name])
-            continue;
+          if (hopByHopHeaders[name]) continue;
           headers[name] = inHeaders[name];
         }
         if (inHeaders.connection) {
@@ -505,10 +502,8 @@ var require_http_cache_semantics = __commonJS({
         return new this(void 0, void 0, { _fromObject: obj });
       }
       _fromObject(obj) {
-        if (this._responseTime)
-          throw Error("Reinitialized");
-        if (!obj || obj.v !== 1)
-          throw Error("Invalid serialization");
+        if (this._responseTime) throw Error("Reinitialized");
+        if (!obj || obj.v !== 1) throw Error("Invalid serialization");
         this._responseTime = obj.t;
         this._isShared = obj.sh;
         this._cacheHeuristic = obj.ch;
@@ -650,8 +645,7 @@ var require_http_cache_semantics = __commonJS({
 var require_json_buffer = __commonJS({
   "node_modules/json-buffer/index.js"(exports2) {
     exports2.stringify = function stringify(o) {
-      if ("undefined" == typeof o)
-        return o;
+      if ("undefined" == typeof o) return o;
       if (o && Buffer.isBuffer(o))
         return JSON.stringify(":base64:" + o.toString("base64"));
       if (o && o.toJSON)
@@ -3689,8 +3683,7 @@ var require_lru_cache = __commonJS({
       return true;
     };
     LRUCache.prototype.has = function(key) {
-      if (!this[CACHE].has(key))
-        return false;
+      if (!this[CACHE].has(key)) return false;
       var hit = this[CACHE].get(key).value;
       if (isStale(this, hit)) {
         return false;
@@ -3705,8 +3698,7 @@ var require_lru_cache = __commonJS({
     };
     LRUCache.prototype.pop = function() {
       var node2 = this[LRU_LIST].tail;
-      if (!node2)
-        return null;
+      if (!node2) return null;
       del(this, node2);
       return node2.value;
     };
@@ -3741,15 +3733,13 @@ var require_lru_cache = __commonJS({
         var hit = node2.value;
         if (isStale(self, hit)) {
           del(self, node2);
-          if (!self[ALLOW_STALE])
-            hit = void 0;
+          if (!self[ALLOW_STALE]) hit = void 0;
         } else {
           if (doUse) {
             self[LRU_LIST].unshiftNode(node2);
           }
         }
-        if (hit)
-          hit = hit.value;
+        if (hit) hit = hit.value;
       }
       return hit;
     }
@@ -3985,8 +3975,7 @@ var require_which = __commonJS({
         }
         ;
         (function E(ii, ll) {
-          if (ii === ll)
-            return F(i + 1, l);
+          if (ii === ll) return F(i + 1, l);
           var ext = pathExt[ii];
           isexe(p + ext, { pathExt: pathExtExe }, function(er, is2) {
             if (!er && is2) {
@@ -4288,10 +4277,8 @@ var require_promise = __commonJS({
         };
       }
       function Promise2(fn) {
-        if (!(this instanceof Promise2))
-          throw new TypeError("Promises must be constructed via new");
-        if (typeof fn !== "function")
-          throw new TypeError("not a function");
+        if (!(this instanceof Promise2)) throw new TypeError("Promises must be constructed via new");
+        if (typeof fn !== "function") throw new TypeError("not a function");
         this._state = 0;
         this._handled = false;
         this._value = void 0;
@@ -4325,8 +4312,7 @@ var require_promise = __commonJS({
       }
       function resolve5(self, newValue) {
         try {
-          if (newValue === self)
-            throw new TypeError("A promise cannot be resolved with itself.");
+          if (newValue === self) throw new TypeError("A promise cannot be resolved with itself.");
           if (newValue && (typeof newValue === "object" || typeof newValue === "function")) {
             var then = newValue.then;
             if (newValue instanceof Promise2) {
@@ -4373,19 +4359,16 @@ var require_promise = __commonJS({
         var done = false;
         try {
           fn(function(value) {
-            if (done)
-              return;
+            if (done) return;
             done = true;
             resolve5(self, value);
           }, function(reason) {
-            if (done)
-              return;
+            if (done) return;
             done = true;
             reject(self, reason);
           });
         } catch (ex) {
-          if (done)
-            return;
+          if (done) return;
           done = true;
           reject(self, ex);
         }
@@ -4400,11 +4383,9 @@ var require_promise = __commonJS({
       };
       Promise2.all = function(arr) {
         return new Promise2(function(resolve6, reject2) {
-          if (!arr || typeof arr.length === "undefined")
-            throw new TypeError("Promise.all accepts an array");
+          if (!arr || typeof arr.length === "undefined") throw new TypeError("Promise.all accepts an array");
           var args = Array.prototype.slice.call(arr);
-          if (args.length === 0)
-            return resolve6([]);
+          if (args.length === 0) return resolve6([]);
           var remaining = args.length;
           function res(i2, val) {
             try {
@@ -4668,22 +4649,18 @@ var require_ChildProcessPromise2 = __commonJS({
           var descriptor = props[i];
           descriptor.enumerable = descriptor.enumerable || false;
           descriptor.configurable = true;
-          if ("value" in descriptor)
-            descriptor.writable = true;
+          if ("value" in descriptor) descriptor.writable = true;
           Object.defineProperty(target, descriptor.key, descriptor);
         }
       }
       return function(Constructor, protoProps, staticProps) {
-        if (protoProps)
-          defineProperties(Constructor.prototype, protoProps);
-        if (staticProps)
-          defineProperties(Constructor, staticProps);
+        if (protoProps) defineProperties(Constructor.prototype, protoProps);
+        if (staticProps) defineProperties(Constructor, staticProps);
         return Constructor;
       };
     }();
     var _get = function get(object, property, receiver) {
-      if (object === null)
-        object = Function.prototype;
+      if (object === null) object = Function.prototype;
       var desc = Object.getOwnPropertyDescriptor(object, property);
       if (desc === void 0) {
         var parent = Object.getPrototypeOf(object);
@@ -4718,8 +4695,7 @@ var require_ChildProcessPromise2 = __commonJS({
         throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
       }
       subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });
-      if (superClass)
-        Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+      if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
     }
     var Promise2;
     if (require_node_version().major >= 4) {
@@ -4805,8 +4781,7 @@ var require_ChildProcessError2 = __commonJS({
         throw new TypeError("Super expression must either be null or a function, not " + typeof superClass);
       }
       subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });
-      if (superClass)
-        Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+      if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
     }
     var ChildProcessError = function(_Error) {
       _inherits(ChildProcessError2, _Error);
@@ -5251,11 +5226,9 @@ function sync_default(start, callback) {
   }
   while (true) {
     tmp = callback(dir, (0, import_fs.readdirSync)(dir));
-    if (tmp)
-      return (0, import_path.resolve)(dir, tmp);
+    if (tmp) return (0, import_path.resolve)(dir, tmp);
     dir = (0, import_path.dirname)(tmp = dir);
-    if (tmp === dir)
-      break;
+    if (tmp === dir) break;
   }
 }
 
@@ -8305,19 +8278,14 @@ function mergeDeep(config1, config2) {
 
 // node_modules/yargs/build/lib/yargs-factory.js
 var __classPrivateFieldSet = function(receiver, state, value, kind, f) {
-  if (kind === "m")
-    throw new TypeError("Private method is not writable");
-  if (kind === "a" && !f)
-    throw new TypeError("Private accessor was defined without a setter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-    throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
   return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
 };
 var __classPrivateFieldGet = function(receiver, state, kind, f) {
-  if (kind === "a" && !f)
-    throw new TypeError("Private accessor was defined without a getter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-    throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
   return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _YargsInstance_command;
@@ -11223,19 +11191,14 @@ var isFile = (value) => Boolean(value && typeof value === "object" && isFunction
 
 // node_modules/form-data-encoder/lib/FormDataEncoder.js
 var __classPrivateFieldSet2 = function(receiver, state, value, kind, f) {
-  if (kind === "m")
-    throw new TypeError("Private method is not writable");
-  if (kind === "a" && !f)
-    throw new TypeError("Private accessor was defined without a setter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-    throw new TypeError("Cannot write private member to an object whose class did not declare it");
+  if (kind === "m") throw new TypeError("Private method is not writable");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
   return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
 };
 var __classPrivateFieldGet2 = function(receiver, state, kind, f) {
-  if (kind === "a" && !f)
-    throw new TypeError("Private accessor was defined without a getter");
-  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-    throw new TypeError("Cannot read private member from an object whose class did not declare it");
+  if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+  if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
   return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
 var _FormDataEncoder_instances;
@@ -14998,7 +14961,7 @@ var node = async (endpoint, body) => {
   return await source_default2.post("http://0.0.0.0:3009/" + endpoint, {
     json: body,
     timeout: {
-      request: 21e3
+      request: 1e3 * 1e3
     }
   }).json();
 };
@@ -15082,7 +15045,7 @@ yargs_default(hideBin(process.argv)).command("db:backup", "backup database to th
   return yargs.positional("week", {
     describe: "week number"
   }).option("topic", {
-    describe: "the name of the data category, one of: fs,ves,kto,mss,wdims",
+    describe: "the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten",
     default: "all"
   }).option("db", {
     describe: "name of the db",
@@ -15091,6 +15054,16 @@ yargs_default(hideBin(process.argv)).command("db:backup", "backup database to th
 }, async (argv) => {
   const db = argv.db == null ? "img_" + argv.week : argv.db;
   const res = await node("data_entry", { week: argv.week, topic: argv.topic, db });
+  process.stdout.write(JSON.stringify(res));
+}).command("data:validate [week] [topic]", "import data from csv", (yargs) => {
+  return yargs.positional("week", {
+    describe: "week number"
+  }).positional("topic", {
+    describe: "the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten",
+    default: "all"
+  });
+}, async (argv) => {
+  const res = await node("data_validate", { week: argv.week, topic: argv.topic });
   process.stdout.write(JSON.stringify(res));
 }).command("api:view [name] [db]", "add the public read permissions for a new api endpoint", (yargs) => {
   return yargs.positional("name", {
@@ -15112,26 +15085,8 @@ node-version/index.js:
    *)
 
 yargs-parser/build/lib/string-utils.js:
-  (**
-   * @license
-   * Copyright (c) 2016, Contributors
-   * SPDX-License-Identifier: ISC
-   *)
-
 yargs-parser/build/lib/tokenize-arg-string.js:
-  (**
-   * @license
-   * Copyright (c) 2016, Contributors
-   * SPDX-License-Identifier: ISC
-   *)
-
 yargs-parser/build/lib/yargs-parser-types.js:
-  (**
-   * @license
-   * Copyright (c) 2016, Contributors
-   * SPDX-License-Identifier: ISC
-   *)
-
 yargs-parser/build/lib/yargs-parser.js:
   (**
    * @license

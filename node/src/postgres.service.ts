@@ -13,6 +13,7 @@ export interface IPostgresService {
     dump: (db: string, name: string) => Promise<string>;
     importCsv: (db: string, topic: string) => Promise<string>;
     restoreDump: (db: string, name: string) => Promise<string>;
+    bulkInsert: (rows: any[], table: string, db: string, instance: string) => Promise<boolean>;
 }
 
 export class PostgresService {
@@ -53,33 +54,118 @@ export class PostgresService {
         return await this.runPsql(cmd, db);
     }
 
-    async insert(data: any, table: string, db: string, instance: string = 'db1') {
+    async bulkInsert(rows: any[], table: string, db: string, instance: string = 'db1') {
 
-        function joinValues(data: any) {
+        // Get column names from the first row and ensure no trailing comma
+        let validColumns = Object.keys(rows[0]).filter(key => rows[0][key] !== undefined && rows[0][key] !== null && rows[0][key] !== '');
+        let columns = validColumns.join(", ");
 
-            let string = "";
+        const INT_MAX = 1000000;  // Reasonable cap for regular counts
+        const CUMUL_MAX = 10000000;  // Reasonable cap for cumulative counts
+        const AGE_MAX = 3650;  // Reasonable cap for age metrics (10 years in days)
 
-            for (const [key, value] of Object.entries(data)) {
+        function checkIntValue(value: any, isCumulative: boolean = false): string {
+            if (value === null || value === '') return '0';
+            
+            try {
+                // Convert scientific notation or large decimals to regular numbers
+                const num = typeof value === 'string' ? 
+                    (value.includes('e') || value.includes('E') ? 0 : parseInt(value)) : 
+                    parseInt(value.toString());
 
-                if (['gemeente',"datum","pc4","jaar_week","datum_maandag","domein_code","regeling_code","zaaktype"].indexOf(key) > -1)  {
-                    string = string.concat("'" + value + "'");
-                } else {
-                    string = string.concat(String(value));
-                }
-                string = string.concat(",");
+                if (isNaN(num)) return '0';
+                
+                // Zero out unreasonably large values
+                const max = isCumulative ? CUMUL_MAX : INT_MAX;
+                return num > max ? '0' : num.toString();
+            } catch (e) {
+                return '0';
             }
-
-            return string.slice(0,-1);
         }
 
-        const cmd = `
-            INSERT INTO main.` + table + `(` + Object.keys(data).join(", ") + `)
-            VALUES (` + joinValues(data) + `);
-        `;
-
-        // console.log(cmd);
+        function checkNumericValue(value: any, isAge: boolean = false): string {
+            if (value === null || value === '') return '0';
             
-        return await this.runPsql(cmd, db, instance);
+            try {
+                // Convert scientific notation or large decimals to regular numbers
+                const num = typeof value === 'string' ? 
+                    (value.includes('e') || value.includes('E') ? 0 : parseFloat(value)) : 
+                    parseFloat(value.toString());
+
+                if (isNaN(num)) return '0';
+                
+                // Cap age values at reasonable maximum
+                if (isAge && num > AGE_MAX) {
+                    return AGE_MAX.toString();
+                }
+                
+                return num.toString();
+            } catch (e) {
+                return '0';
+            }
+        }
+
+        // Process in chunks of 100 rows to avoid E2BIG error
+        const chunkSize = 100;
+        let success = true;
+
+        for (let i = 0; i < rows.length; i += chunkSize) {
+            const chunk = rows.slice(i, i + chunkSize);
+            let string = "INSERT INTO main." + table + " (" + columns + ") VALUES ";
+
+            for (const row of chunk) {
+                string = string.concat("(");
+
+                for (const key of validColumns) {
+                    const value = row[key];
+                    if (value === null) {
+                        string = string.concat("NULL");
+                    } else if (['gemeente',"datum","pc4","jaar_week", "datum_maandag", "domein_code", "regeling_code", "zaaktype"].indexOf(key) > -1)  {
+                        string = string.concat("'" + value + "'");
+                    } else if (key.endsWith("_eur") || key === "bz_percentage" || key === "dlt_verwacht_rolling8" || key === "dlt_gerealiseerd_gemiddeld" || key === "dlt_gerealiseerd_mediaan") {
+                        string = string.concat(checkNumericValue(value) + "::NUMERIC");
+                    } else if (key === "ouderdom_voorraad_gemiddeld" || key === "ouderdom_voorraad_mediaan") {
+                        string = string.concat(checkNumericValue(value, true) + "::NUMERIC");
+                    } else if (key.endsWith("_aantal") || key === "voorraad_aantal_" || (key.startsWith("ouderdom_voorraad_") && !key.endsWith("gemiddeld") && !key.endsWith("mediaan"))) {
+                        string = string.concat(checkIntValue(value, false) + "::INTEGER");
+                    } else if (key.endsWith("_cumul")) {
+                        string = string.concat(checkIntValue(value, true) + "::INTEGER");
+                    } else {
+                        string = string.concat(String(value));
+                    }
+                    string = string.concat(",");
+                }
+
+                // Remove all trailing commas
+                while (string.endsWith(",")) {
+                    string = string.slice(0, -1);
+                }
+
+                string = string.concat("),");
+            }
+
+            // Remove all trailing commas
+            while (string.endsWith(",")) {
+                string = string.slice(0, -1);
+            }
+
+            string = string.concat(";");
+
+            console.log(`Inserting chunk ${i/chunkSize + 1} of ${Math.ceil(rows.length/chunkSize)}`);
+            
+            const result = await this.runPsql(string, db, instance);
+            if (!result) {
+                success = false;
+                break;
+            }
+        }
+        
+        return success;
+    }
+
+    async insert(data: any, table: string, db: string, instance: string = 'db1') {
+        // Convert single insert to bulk insert
+        return await this.bulkInsert([data], table, db, instance);
     }
 
     async update(data: any, table: string, key: string, db: string) {
@@ -211,7 +297,7 @@ export class PostgresService {
 
             args = args.concat("-c",cmd);
 
-            console.log(args);
+            //console.log(args);
 
             let res = await this.childProcess(bin,args);
 

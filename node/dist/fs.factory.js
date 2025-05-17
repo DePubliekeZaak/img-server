@@ -15,9 +15,12 @@ const cleanFs = (data) => {
             const a = row['Datum'].split("-");
             row['Datum'] = a[2] + '-' + addZero(a[1]) + '-' + addZero(a[0]);
         }
+        if (row['Gemeente'].startsWith("'")) {
+            row['Gemeente'] = row['Gemeente'].slice(1);
+        }
         let r = {};
         for (let [key, value] of Object.entries(row)) {
-            r[(0, format_factory_1.slugify)(key)] = value == '' ? null : value;
+            r[(0, format_factory_1.slugify)(key)] = value == '' ? 0 : value;
         }
         output.push(r);
     }

@@ -54,16 +54,17 @@ app.post('/publish', async (req, res) => {
 
 app.post('/data_entry', async (req, res) => {
 
-  console.log(req.body);
-
   if (req.body.topic == 'all') {
     res.send(await data.all(req.body.week, req.body.db));
-  } else if (req.body.topic == 'gemeenten') {
-    console.log('hallo');
+  } else if (req.body.topic == 'gemeenten' || req.body.topic == 'zaaktypes') {
     res.send(await data.entry2(req.body.week, req.body.topic, req.body.db));
   } else {
     res.send(await data.entry(req.body.week, req.body.topic, req.body.db));
   }
+});
+
+app.post('/data_validate', async (req, res) => {
+  res.send(await data.validate(req.body.week, req.body.topic));
 });
 
 app.post('/api_view', async (req, res) => {

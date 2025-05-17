@@ -62,7 +62,7 @@ yargs(hideBin(process.argv))
         describe: 'week number'
     })
         .option('topic', {
-        describe: 'the name of the data category, one of: fs,ves,kto,mss,wdims',
+        describe: 'the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten',
         default: 'all'
     })
         .option('db', {
@@ -72,6 +72,19 @@ yargs(hideBin(process.argv))
 }, async (argv) => {
     const db = (argv.db == null) ? "img_" + argv.week : argv.db;
     const res = await node('data_entry', { week: argv.week, topic: argv.topic, db });
+    process.stdout.write(JSON.stringify(res));
+})
+    .command('data:validate [week] [topic]', 'import data from csv', (yargs) => {
+    return yargs
+        .positional('week', {
+        describe: 'week number'
+    })
+        .positional('topic', {
+        describe: 'the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten',
+        default: 'all'
+    });
+}, async (argv) => {
+    const res = await node('data_validate', { week: argv.week, topic: argv.topic });
     process.stdout.write(JSON.stringify(res));
 })
     .command('api:view [name] [db]', 'add the public read permissions for a new api endpoint', (yargs) => {

@@ -55,17 +55,18 @@ app.post('/publish', (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.send(yield db.upgrade("staging", "public"));
 }));
 app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.body);
     if (req.body.topic == 'all') {
         res.send(yield data.all(req.body.week, req.body.db));
     }
-    else if (req.body.topic == 'gemeenten') {
-        console.log('hallo');
+    else if (req.body.topic == 'gemeenten' || req.body.topic == 'zaaktypes') {
         res.send(yield data.entry2(req.body.week, req.body.topic, req.body.db));
     }
     else {
         res.send(yield data.entry(req.body.week, req.body.topic, req.body.db));
     }
+}));
+app.post('/data_validate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.send(yield data.validate(req.body.week, req.body.topic));
 }));
 app.post('/api_view', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.addViewToApi(req.body.name, req.body.db));

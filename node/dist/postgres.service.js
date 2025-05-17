@@ -45,27 +45,110 @@ class PostgresService {
             return yield this.runPsql(cmd, db);
         });
     }
+    bulkInsert(rows, table, db, instance = 'db1') {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Get column names from the first row and ensure no trailing comma
+            let validColumns = Object.keys(rows[0]).filter(key => rows[0][key] !== undefined && rows[0][key] !== null && rows[0][key] !== '');
+            let columns = validColumns.join(", ");
+            const INT_MAX = 1000000; // Reasonable cap for regular counts
+            const CUMUL_MAX = 10000000; // Reasonable cap for cumulative counts
+            const AGE_MAX = 3650; // Reasonable cap for age metrics (10 years in days)
+            function checkIntValue(value, isCumulative = false) {
+                if (value === null || value === '')
+                    return '0';
+                try {
+                    // Convert scientific notation or large decimals to regular numbers
+                    const num = typeof value === 'string' ?
+                        (value.includes('e') || value.includes('E') ? 0 : parseInt(value)) :
+                        parseInt(value.toString());
+                    if (isNaN(num))
+                        return '0';
+                    // Zero out unreasonably large values
+                    const max = isCumulative ? CUMUL_MAX : INT_MAX;
+                    return num > max ? '0' : num.toString();
+                }
+                catch (e) {
+                    return '0';
+                }
+            }
+            function checkNumericValue(value, isAge = false) {
+                if (value === null || value === '')
+                    return '0';
+                try {
+                    // Convert scientific notation or large decimals to regular numbers
+                    const num = typeof value === 'string' ?
+                        (value.includes('e') || value.includes('E') ? 0 : parseFloat(value)) :
+                        parseFloat(value.toString());
+                    if (isNaN(num))
+                        return '0';
+                    // Cap age values at reasonable maximum
+                    if (isAge && num > AGE_MAX) {
+                        return AGE_MAX.toString();
+                    }
+                    return num.toString();
+                }
+                catch (e) {
+                    return '0';
+                }
+            }
+            // Process in chunks of 100 rows to avoid E2BIG error
+            const chunkSize = 100;
+            let success = true;
+            for (let i = 0; i < rows.length; i += chunkSize) {
+                const chunk = rows.slice(i, i + chunkSize);
+                let string = "INSERT INTO main." + table + " (" + columns + ") VALUES ";
+                for (const row of chunk) {
+                    string = string.concat("(");
+                    for (const key of validColumns) {
+                        const value = row[key];
+                        if (value === null) {
+                            string = string.concat("NULL");
+                        }
+                        else if (['gemeente', "datum", "pc4", "jaar_week", "datum_maandag", "domein_code", "regeling_code", "zaaktype"].indexOf(key) > -1) {
+                            string = string.concat("'" + value + "'");
+                        }
+                        else if (key.endsWith("_eur") || key === "bz_percentage" || key === "dlt_verwacht_rolling8" || key === "dlt_gerealiseerd_gemiddeld" || key === "dlt_gerealiseerd_mediaan") {
+                            string = string.concat(checkNumericValue(value) + "::NUMERIC");
+                        }
+                        else if (key === "ouderdom_voorraad_gemiddeld" || key === "ouderdom_voorraad_mediaan") {
+                            string = string.concat(checkNumericValue(value, true) + "::NUMERIC");
+                        }
+                        else if (key.endsWith("_aantal") || key === "voorraad_aantal_" || (key.startsWith("ouderdom_voorraad_") && !key.endsWith("gemiddeld") && !key.endsWith("mediaan"))) {
+                            string = string.concat(checkIntValue(value, false) + "::INTEGER");
+                        }
+                        else if (key.endsWith("_cumul")) {
+                            string = string.concat(checkIntValue(value, true) + "::INTEGER");
+                        }
+                        else {
+                            string = string.concat(String(value));
+                        }
+                        string = string.concat(",");
+                    }
+                    // Remove all trailing commas
+                    while (string.endsWith(",")) {
+                        string = string.slice(0, -1);
+                    }
+                    string = string.concat("),");
+                }
+                // Remove all trailing commas
+                while (string.endsWith(",")) {
+                    string = string.slice(0, -1);
+                }
+                string = string.concat(";");
+                console.log(`Inserting chunk ${i / chunkSize + 1} of ${Math.ceil(rows.length / chunkSize)}`);
+                const result = yield this.runPsql(string, db, instance);
+                if (!result) {
+                    success = false;
+                    break;
+                }
+            }
+            return success;
+        });
+    }
     insert(data, table, db, instance = 'db1') {
         return __awaiter(this, void 0, void 0, function* () {
-            function joinValues(data) {
-                let string = "";
-                for (const [key, value] of Object.entries(data)) {
-                    if (['gemeente', "datum", "pc4", "jaar_week", "datum_maandag", "domein_code", "regeling_code", "zaaktype"].indexOf(key) > -1) {
-                        string = string.concat("'" + value + "'");
-                    }
-                    else {
-                        string = string.concat(String(value));
-                    }
-                    string = string.concat(",");
-                }
-                return string.slice(0, -1);
-            }
-            const cmd = `
-            INSERT INTO main.` + table + `(` + Object.keys(data).join(", ") + `)
-            VALUES (` + joinValues(data) + `);
-        `;
-            // console.log(cmd);
-            return yield this.runPsql(cmd, db, instance);
+            // Convert single insert to bulk insert
+            return yield this.bulkInsert([data], table, db, instance);
         });
     }
     update(data, table, key, db) {
@@ -171,7 +254,7 @@ class PostgresService {
                     args = args.concat("-d", db);
                 }
                 args = args.concat("-c", cmd);
-                console.log(args);
+                //console.log(args);
                 let res = yield this.childProcess(bin, args);
                 success = true;
             }
