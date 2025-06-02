@@ -55,6 +55,8 @@ app.post('/publish', (req, res) => __awaiter(void 0, void 0, void 0, function* (
     res.send(yield db.upgrade("staging", "public"));
 }));
 app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("data entry");
+    console.log(req.body);
     if (req.body.topic == 'all') {
         res.send(yield data.all(req.body.week, req.body.db));
     }

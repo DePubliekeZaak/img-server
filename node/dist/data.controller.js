@@ -52,16 +52,16 @@ class DataController {
                 console.log(year + week);
                 switch (topic) {
                     case 'gemeenten':
-                        data = yield this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
-                        data = (0, csv_factory_1.csvToArray)(data, ",");
+                        data = yield this.bucket.readFile(year + '/' + week + '/gemeenten_v4.csv');
+                        data = (0, csv_factory_1.csvToArray)(data, ";");
                         data = (0, clean_1.cleanGemeenten)(data);
                         yield this.postgres.bulkInsert(data, 'gemeenten', db, "db2");
                         break;
                     case 'zaaktypes':
-                        data = yield this.bucket.readFile(year + '/' + week + '/zaaktypes.csv');
-                        data = (0, csv_factory_1.csvToArray)(data, ",");
-                        data = (0, clean_1.cleanZaaktypes)(data);
-                        yield this.postgres.bulkInsert(data, 'zaaktypes', db, "db2");
+                        data = yield this.bucket.readFile(year + '/' + week + '/zaaktypes_v4.csv');
+                        data = (0, csv_factory_1.csvToArray)(data, ";");
+                        const cleaned_data = (0, clean_1.cleanZaaktypes)(data);
+                        yield this.postgres.bulkInsert(cleaned_data, 'zaaktypes', db, "db2");
                         break;
                 }
                 return {

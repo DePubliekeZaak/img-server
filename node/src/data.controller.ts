@@ -60,17 +60,17 @@ export class DataController implements IDataController {
             switch (topic) {
 
                 case 'gemeenten': 
-                    data = await this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
-                    data = csvToArray(data,",");
+                    data = await this.bucket.readFile(year + '/' + week + '/gemeenten_v4.csv');
+                    data = csvToArray(data,";");
                     data = cleanGemeenten(data);
                     await this.postgres.bulkInsert(data, 'gemeenten', db, "db2");
                     break;
 
                 case 'zaaktypes': 
-                    data = await this.bucket.readFile(year + '/' + week + '/zaaktypes.csv');
-                    data = csvToArray(data,",");
-                    data = cleanZaaktypes(data);
-                    await this.postgres.bulkInsert(data, 'zaaktypes', db, "db2");
+                    data = await this.bucket.readFile(year + '/' + week + '/zaaktypes_v4.csv');
+                    data = csvToArray(data,";");
+                    const cleaned_data = cleanZaaktypes(data);
+                    await this.postgres.bulkInsert(cleaned_data, 'zaaktypes', db, "db2");
                     break;
             }
 

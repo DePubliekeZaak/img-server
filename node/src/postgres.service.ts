@@ -58,6 +58,8 @@ export class PostgresService {
 
         // Get column names from the first row and ensure no trailing comma
         let validColumns = Object.keys(rows[0]).filter(key => rows[0][key] !== undefined && rows[0][key] !== null && rows[0][key] !== '');
+        validColumns = validColumns.filter( c => c != 'laad_dt');
+        validColumns.push('jaar_maand');
         let columns = validColumns.join(", ");
 
         const INT_MAX = 1000000;  // Reasonable cap for regular counts
@@ -106,12 +108,13 @@ export class PostgresService {
         }
 
         // Process in chunks of 100 rows to avoid E2BIG error
-        const chunkSize = 100;
+        const chunkSize = 48;
         let success = true;
 
         for (let i = 0; i < rows.length; i += chunkSize) {
             const chunk = rows.slice(i, i + chunkSize);
             let string = "INSERT INTO main." + table + " (" + columns + ") VALUES ";
+
 
             for (const row of chunk) {
                 string = string.concat("(");
@@ -120,10 +123,15 @@ export class PostgresService {
                     const value = row[key];
                     if (value === null) {
                         string = string.concat("NULL");
-                    } else if (['gemeente',"datum","pc4","jaar_week", "datum_maandag", "domein_code", "regeling_code", "zaaktype"].indexOf(key) > -1)  {
+                    } else if (value === undefined) {
+                        continue;
+                    } else if (['gemeente',"datum","pc4","jaar_week", "week_vanaf", "week_totenmet", "domein_code", "regeling_code", "zaaktype","voorraad_d"].indexOf(key) > -1)  {
                         string = string.concat("'" + value + "'");
-                    } else if (key.endsWith("_eur") || key === "bz_percentage" || key === "dlt_verwacht_rolling8" || key === "dlt_gerealiseerd_gemiddeld" || key === "dlt_gerealiseerd_mediaan") {
-                        string = string.concat(checkNumericValue(value) + "::NUMERIC");
+                    } else if (key.endsWith("_eur")) {
+                        let roundedValue = Math.round(value * 100) / 100; 
+                        string = string.concat(roundedValue + "::NUMERIC");
+                    } else if (key === "dlt_verwacht_gemiddeld" || key === "dlt_verwacht_mediaan" || key === "bz_percentage" || key === "dlt_verwacht_rolling8" || key === "dlt_gerealiseerd_gemiddeld" || key === "dlt_gerealiseerd_mediaan") {
+                        string = string.concat(parseFloat(value).toFixed(2) + "::NUMERIC");
                     } else if (key === "ouderdom_voorraad_gemiddeld" || key === "ouderdom_voorraad_mediaan") {
                         string = string.concat(checkNumericValue(value, true) + "::NUMERIC");
                     } else if (key.endsWith("_aantal") || key === "voorraad_aantal_" || (key.startsWith("ouderdom_voorraad_") && !key.endsWith("gemiddeld") && !key.endsWith("mediaan"))) {
@@ -135,6 +143,11 @@ export class PostgresService {
                     }
                     string = string.concat(",");
                 }
+
+                let datum = new Date(row['week_vanaf']);
+                let year = datum.getFullYear();
+                let month = (datum.getMonth() + 1).toString().padStart(2, '0');
+                string = string.concat("'" + year + "_" + month + "'");
 
                 // Remove all trailing commas
                 while (string.endsWith(",")) {

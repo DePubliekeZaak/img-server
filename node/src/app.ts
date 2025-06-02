@@ -54,6 +54,10 @@ app.post('/publish', async (req, res) => {
 
 app.post('/data_entry', async (req, res) => {
 
+  console.log("data entry");
+
+  console.log(req.body);
+
   if (req.body.topic == 'all') {
     res.send(await data.all(req.body.week, req.body.db));
   } else if (req.body.topic == 'gemeenten' || req.body.topic == 'zaaktypes') {
