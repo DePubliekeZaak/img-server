@@ -45,112 +45,147 @@ class PostgresService {
             return yield this.runPsql(cmd, db);
         });
     }
-    bulkInsert(rows, table, db, instance = 'db1') {
+    bulkInsert(rows, table, db, instance = "db1") {
         return __awaiter(this, void 0, void 0, function* () {
-            // Get column names from the first row and ensure no trailing comma
-            let validColumns = Object.keys(rows[0]).filter(key => rows[0][key] !== undefined && rows[0][key] !== null && rows[0][key] !== '');
-            validColumns = validColumns.filter(c => c != 'laad_dt');
-            validColumns.push('jaar_maand');
-            let columns = validColumns.join(", ");
-            const INT_MAX = 1000000; // Reasonable cap for regular counts
-            const CUMUL_MAX = 10000000; // Reasonable cap for cumulative counts
-            const AGE_MAX = 3650; // Reasonable cap for age metrics (10 years in days)
-            function checkIntValue(value, isCumulative = false) {
-                if (value === null || value === '')
-                    return '0';
-                try {
-                    // Convert scientific notation or large decimals to regular numbers
-                    const num = typeof value === 'string' ?
-                        (value.includes('e') || value.includes('E') ? 0 : parseInt(value)) :
-                        parseInt(value.toString());
-                    if (isNaN(num))
-                        return '0';
-                    // Zero out unreasonably large values
-                    const max = isCumulative ? CUMUL_MAX : INT_MAX;
-                    return num > max ? '0' : num.toString();
-                }
-                catch (e) {
-                    return '0';
-                }
+            if (!rows || rows.length === 0) {
+                return true;
             }
-            function checkNumericValue(value, isAge = false) {
-                if (value === null || value === '')
-                    return '0';
-                try {
-                    // Convert scientific notation or large decimals to regular numbers
-                    const num = typeof value === 'string' ?
-                        (value.includes('e') || value.includes('E') ? 0 : parseFloat(value)) :
-                        parseFloat(value.toString());
-                    if (isNaN(num))
-                        return '0';
-                    // Cap age values at reasonable maximum
-                    if (isAge && num > AGE_MAX) {
-                        return AGE_MAX.toString();
+            const validColumns = Object.keys(rows[0]);
+            const columns = validColumns.join(", ");
+            ``; // String field types for efficient lookup
+            const stringFields = new Set([
+                "gemeente",
+                "datum",
+                "pc4",
+                "jaar_week",
+                "week_vanaf",
+                "week_totenmet",
+                "domein_code",
+                "regeling_code",
+                "zaaktype",
+                "voorraad_d",
+                "laad_dt",
+                "jaar_maand",
+                "maandnaam",
+                "maand_vanaf",
+                "maand_totenmet",
+            ]);
+            const percentageFields = new Set([
+                "dlt_verwacht_gemiddeld",
+                "dlt_verwacht_mediaan",
+                "bz_percentage",
+                "dlt_verwacht_rolling8",
+                "dlt_gerealiseerd_gemiddeld",
+                "dlt_gerealiseerd_mediaan",
+                "beschikt_binn_termijn_perc",
+                "beschikt_binn_termijn_cumul_perc",
+                "toegekend_cumul_perc",
+                "bz_cumul_perc",
+            ]);
+            const averageFields = new Set([
+                "ouderdom_voorraad_gemiddeld",
+                "ouderdom_voorraad_mediaan",
+            ]);
+            // Helper function to format value based on field type
+            const formatValue = (key, value) => {
+                if (value === null || value === undefined || value === "NULL") {
+                    return "NULL";
+                }
+                // Handle NaN values universally first
+                if (value === "NaN" || (typeof value === "number" && isNaN(value))) {
+                    if (key.endsWith("_eur") ||
+                        percentageFields.has(key) ||
+                        averageFields.has(key)) {
+                        return "0::NUMERIC";
                     }
-                    return num.toString();
+                    else if (key.endsWith("_aantal") ||
+                        key.endsWith("_cumul") ||
+                        key === "voorraad_aantal_" ||
+                        (key.startsWith("ouderdom_voorraad_") &&
+                            !key.endsWith("gemiddeld") &&
+                            !key.endsWith("mediaan"))) {
+                        return "0::INTEGER";
+                    }
+                    else {
+                        return "0";
+                    }
                 }
-                catch (e) {
-                    return '0';
+                if (stringFields.has(key)) {
+                    if (value === null ||
+                        value === undefined ||
+                        value === "" ||
+                        value === "NULL") {
+                        return "NULL";
+                    }
+                    const cleanValue = String(value).replace(/\r/g, "").replace(/'/g, "''");
+                    return `'${cleanValue}'`;
                 }
-            }
-            // Process in chunks of 100 rows to avoid E2BIG error
+                if (key.endsWith("_eur")) {
+                    const numValue = Number(value);
+                    if (isNaN(numValue)) {
+                        return "0::NUMERIC";
+                    }
+                    const roundedValue = Math.round(numValue * 100) / 100;
+                    return `${roundedValue}::NUMERIC`;
+                }
+                if (percentageFields.has(key)) {
+                    // Remove % character if present before parsing
+                    const cleanValue = String(value).replace(/%/g, "");
+                    let numValue = parseFloat(cleanValue);
+                    if (value === "NaN" ||
+                        isNaN(numValue) ||
+                        value === null ||
+                        value === undefined) {
+                        return "0::NUMERIC";
+                    }
+                    if (key.includes("perc")) {
+                        numValue = numValue * 100;
+                    }
+                    return `${numValue.toFixed(2)}::NUMERIC`;
+                }
+                if (averageFields.has(key)) {
+                    const numValue = Number(value);
+                    if (isNaN(numValue)) {
+                        return "0::NUMERIC";
+                    }
+                    return `${numValue}::NUMERIC`;
+                }
+                if (key.endsWith("_aantal") ||
+                    key === "voorraad_aantal_" ||
+                    (key.startsWith("ouderdom_voorraad_") &&
+                        !key.endsWith("gemiddeld") &&
+                        !key.endsWith("mediaan"))) {
+                    const intValue = parseInt(value);
+                    if (isNaN(intValue)) {
+                        return "0::INTEGER";
+                    }
+                    return `${intValue}::INTEGER`;
+                }
+                if (key.endsWith("_cumul")) {
+                    const intValue = parseInt(value);
+                    if (isNaN(intValue)) {
+                        return "0::INTEGER";
+                    }
+                    return `${intValue}::INTEGER`;
+                }
+                return String(value);
+            };
+            // Process in larger chunks for better performance
             const chunkSize = 48;
             let success = true;
             for (let i = 0; i < rows.length; i += chunkSize) {
                 const chunk = rows.slice(i, i + chunkSize);
-                let string = "INSERT INTO main." + table + " (" + columns + ") VALUES ";
+                // Build values array more efficiently
+                const valueRows = [];
                 for (const row of chunk) {
-                    string = string.concat("(");
-                    for (const key of validColumns) {
-                        const value = row[key];
-                        if (value === null) {
-                            string = string.concat("NULL");
-                        }
-                        else if (value === undefined) {
-                            continue;
-                        }
-                        else if (['gemeente', "datum", "pc4", "jaar_week", "week_vanaf", "week_totenmet", "domein_code", "regeling_code", "zaaktype", "voorraad_d"].indexOf(key) > -1) {
-                            string = string.concat("'" + value + "'");
-                        }
-                        else if (key.endsWith("_eur")) {
-                            let roundedValue = Math.round(value * 100) / 100;
-                            string = string.concat(roundedValue + "::NUMERIC");
-                        }
-                        else if (key === "dlt_verwacht_gemiddeld" || key === "dlt_verwacht_mediaan" || key === "bz_percentage" || key === "dlt_verwacht_rolling8" || key === "dlt_gerealiseerd_gemiddeld" || key === "dlt_gerealiseerd_mediaan") {
-                            string = string.concat(parseFloat(value).toFixed(2) + "::NUMERIC");
-                        }
-                        else if (key === "ouderdom_voorraad_gemiddeld" || key === "ouderdom_voorraad_mediaan") {
-                            string = string.concat(checkNumericValue(value, true) + "::NUMERIC");
-                        }
-                        else if (key.endsWith("_aantal") || key === "voorraad_aantal_" || (key.startsWith("ouderdom_voorraad_") && !key.endsWith("gemiddeld") && !key.endsWith("mediaan"))) {
-                            string = string.concat(checkIntValue(value, false) + "::INTEGER");
-                        }
-                        else if (key.endsWith("_cumul")) {
-                            string = string.concat(checkIntValue(value, true) + "::INTEGER");
-                        }
-                        else {
-                            string = string.concat(String(value));
-                        }
-                        string = string.concat(",");
-                    }
-                    let datum = new Date(row['week_vanaf']);
-                    let year = datum.getFullYear();
-                    let month = (datum.getMonth() + 1).toString().padStart(2, '0');
-                    string = string.concat("'" + year + "_" + month + "'");
-                    // Remove all trailing commas
-                    while (string.endsWith(",")) {
-                        string = string.slice(0, -1);
-                    }
-                    string = string.concat("),");
+                    const values = validColumns.map((key) => formatValue(key, row[key]));
+                    valueRows.push(`(${values.join(", ")})`);
                 }
-                // Remove all trailing commas
-                while (string.endsWith(",")) {
-                    string = string.slice(0, -1);
-                }
-                string = string.concat(";");
-                console.log(`Inserting chunk ${i / chunkSize + 1} of ${Math.ceil(rows.length / chunkSize)}`);
-                const result = yield this.runPsql(string, db, instance);
+                const sql = `INSERT INTO main.${table} (${columns}) VALUES ${valueRows.join(", ")};`;
+                console.log(`Inserting chunk ${Math.floor(i / chunkSize) + 1} of ${Math.ceil(rows.length / chunkSize)} (${chunk.length} rows)`);
+                const result = yield this.runPsql(sql, db, instance);
                 if (!result) {
+                    console.error(`Failed to insert chunk starting at row ${i}`);
                     success = false;
                     break;
                 }
@@ -158,7 +193,7 @@ class PostgresService {
             return success;
         });
     }
-    insert(data, table, db, instance = 'db1') {
+    insert(data, table, db, instance = "db1") {
         return __awaiter(this, void 0, void 0, function* () {
             // Convert single insert to bulk insert
             return yield this.bulkInsert([data], table, db, instance);
@@ -169,7 +204,7 @@ class PostgresService {
             function joinValues(data) {
                 let string = "";
                 for (const [key, value] of Object.entries(data)) {
-                    if (['gemeente', "datum", "pc4"].indexOf(key) > -1) {
+                    if (["gemeente", "datum", "pc4"].indexOf(key) > -1) {
                         string = string.concat("'" + value + "'");
                     }
                     else {
@@ -185,9 +220,13 @@ class PostgresService {
                     string = string.concat(`WHEN datum = '${d.date}' THEN ${Math.round(d.value * 1000000)} \n`);
                 }
             }
-            const vs = data.map(d => { return `'` + d.date + `'`; }).join(',');
+            const vs = data
+                .map((d) => {
+                return `'` + d.date + `'`;
+            })
+                .join(",");
             const cmd = `
-            UPDATE main.${table} 
+            UPDATE main.${table}
             SET sum_verleend = CASE
             ${string}END
             WHERE datum IN (${vs});
@@ -208,7 +247,7 @@ class PostgresService {
                 "--dbname",
                 db,
                 "--username",
-                "postgres"
+                "postgres",
             ];
             yield this.childProcess(bin, args);
             return path;
@@ -218,14 +257,14 @@ class PostgresService {
         return __awaiter(this, void 0, void 0, function* () {
             const bin = "psql";
             const args = [
-                '--host',
-                'db1',
-                '--username',
-                'postgres',
-                '-d',
+                "--host",
+                "db1",
+                "--username",
+                "postgres",
+                "-d",
                 db,
-                '-f',
-                `/tmp/${name}.sql`
+                "-f",
+                `/tmp/${name}.sql`,
             ];
             return yield this.childProcess(bin, args);
         });
@@ -235,34 +274,31 @@ class PostgresService {
             const bin = "psql";
             const cmd = `
             COPY main.mms(datum,gemeente,_year,_month,_week,pgv,historie_tcmg_img,historie_nam_cvw,afwijzingen,toekenningen,gemiddeld_verleend)
-            FROM '/tmp/` + topic + `.csv'
+            FROM '/tmp/` +
+                topic +
+                `.csv'
             DELIMITER ','
             CSV HEADER;
         `;
             const args = [
-                '--host',
-                'db1',
-                '--username',
-                'postgres',
-                '-d',
+                "--host",
+                "db1",
+                "--username",
+                "postgres",
+                "-d",
                 db,
-                '-c',
-                cmd
+                "-c",
+                cmd,
             ];
             return yield this.childProcess(bin, args);
         });
     }
-    runPsql(cmd, db, instance = 'db1') {
+    runPsql(cmd, db, instance = "db1") {
         return __awaiter(this, void 0, void 0, function* () {
             let success = false;
             const bin = "psql";
             try {
-                let args = [
-                    "--host",
-                    instance,
-                    "--username",
-                    "postgres",
-                ];
+                let args = ["--host", instance, "--username", "postgres"];
                 if (db !== null) {
                     args = args.concat("-d", db);
                 }
@@ -281,25 +317,28 @@ class PostgresService {
         return __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 let output = "";
-                const spawn = require('child-process-promise').spawn;
-                const promise = spawn('/usr/bin/' + bin, args, { env: { PGPASSWORD: process.env.POSTGRES_PASSWORD } });
+                const spawn = require("child-process-promise").spawn;
+                const promise = spawn("/usr/bin/" + bin, args, {
+                    env: { PGPASSWORD: process.env.POSTGRES_PASSWORD },
+                });
                 const childProcess = promise.childProcess;
-                childProcess.stdout.on('data', function (data) {
+                childProcess.stdout.on("data", function (data) {
                     // console.log('[serve] stdout: ', data.toString());
                     output = output.concat(data.toString());
                 });
-                childProcess.stderr.on('data', function (data) {
-                    console.log('[serve] stderr: ', data.toString());
+                childProcess.stderr.on("data", function (data) {
+                    console.log("[serve] stderr: ", data.toString());
                     reject(data.toString());
                 });
-                promise.then(function () {
+                promise
+                    .then(function () {
                     resolve(output);
                 })
                     .catch(function (err) {
-                    console.error('[spawn] ERROR: ', err);
+                    console.error("[spawn] ERROR: ", err);
                     reject(err);
                 });
-                // is er een soort on exit 
+                // is er een soort on exit
                 // child.on('close', exithandler);
             });
         });

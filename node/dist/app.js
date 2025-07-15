@@ -20,60 +20,60 @@ const db_controller_1 = require("./db.controller");
 const data_controller_1 = require("./data.controller");
 const db = new db_controller_1.DbController();
 const data = new data_controller_1.DataController();
-// create new db .. with web_a non role .. and populate with latest backup 
-app.post('/create', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// create new db .. with web_a non role .. and populate with latest backup
+app.post("/create", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.create(req.body.db, "img-backup-latest"));
 }));
-app.post('/drop', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/drop", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.drop(req.body.db));
 }));
 // update db from latest backup
-app.post('/update', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/update", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.update(req.body.db));
 }));
 // select inactive db and update db from latest backup
-app.post('/prepare', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/prepare", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.create(req.body.db, req.body.source));
 }));
 // import data ...... ????????
-app.post('/import', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/import", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.import());
 }));
-// set new staging db 
-app.post('/stage', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// set new staging db
+app.post("/stage", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.upgrade(req.body.db, "staging"));
 }));
-// set new dev db 
-app.post('/dev', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// set new dev db
+app.post("/dev", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.upgrade(req.body.db, "dev"));
 }));
-app.post('/backup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/backup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.backup(req.body.db, req.body.name));
 }));
-// set new live db 
-app.post('/publish', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// set new live db
+app.post("/publish", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.upgrade("staging", "public"));
 }));
-app.post('/data_entry', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/data_entry", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("data entry");
-    console.log(req.body);
-    if (req.body.topic == 'all') {
+    if (req.body.topic == "all") {
         res.send(yield data.all(req.body.week, req.body.db));
     }
-    else if (req.body.topic == 'gemeenten' || req.body.topic == 'zaaktypes') {
+    else if (req.body.topic.includes("gemeenten") ||
+        req.body.topic.includes("regelingen")) {
         res.send(yield data.entry2(req.body.week, req.body.topic, req.body.db));
     }
     else {
         res.send(yield data.entry(req.body.week, req.body.topic, req.body.db));
     }
 }));
-app.post('/data_validate', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/data_validate", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield data.validate(req.body.week, req.body.topic));
 }));
-app.post('/api_view', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/api_view", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.send(yield db.addViewToApi(req.body.name, req.body.db));
 }));
-app.post('/import_history', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+app.post("/import_history", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const db = "img_2434";
     const key = "VES_toegekend_2a+b_(in miljoen)";
     res.send(yield data.importHistory(db, key));

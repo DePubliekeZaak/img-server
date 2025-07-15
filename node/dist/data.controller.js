@@ -37,10 +37,10 @@ class DataController {
     }
     importHistory(db, key) {
         return __awaiter(this, void 0, void 0, function* () {
-            let data = yield this.bucket.readXlxs('historie/Communicatierapportage_D&I_FS.xlsx');
+            let data = yield this.bucket.readXlxs("historie/Communicatierapportage_D&I_FS.xlsx");
             data = (0, history_factory_1.parseHistory)(data, key);
-            let res1 = yield this.postgres.update(data, 'ves', key, db);
-            return 'ok\n';
+            let res1 = yield this.postgres.update(data, "ves", key, db);
+            return "ok\n";
         });
     }
     entry2(jaar_week, topic, db, archive = false) {
@@ -49,28 +49,41 @@ class DataController {
                 const year = jaar_week.split("_")[0];
                 const week = jaar_week.split("_")[1];
                 let data;
+                let cleaned_data;
                 console.log(year + week);
                 switch (topic) {
-                    case 'gemeenten':
-                        data = yield this.bucket.readFile(year + '/' + week + '/gemeenten_v4.csv');
-                        data = (0, csv_factory_1.csvToArray)(data, ";");
+                    case "gemeenten_week":
+                        data = yield this.bucket.readFile(year + "/" + week + "/gemeenten_week.csv");
+                        data = (0, csv_factory_1.csvToArray)(data, ",");
                         data = (0, clean_1.cleanGemeenten)(data);
-                        yield this.postgres.bulkInsert(data, 'gemeenten', db, "db2");
+                        yield this.postgres.bulkInsert(data, "gemeenten_week", db, "db2");
                         break;
-                    case 'zaaktypes':
-                        data = yield this.bucket.readFile(year + '/' + week + '/zaaktypes_v4.csv');
-                        data = (0, csv_factory_1.csvToArray)(data, ";");
-                        const cleaned_data = (0, clean_1.cleanZaaktypes)(data);
-                        yield this.postgres.bulkInsert(cleaned_data, 'zaaktypes', db, "db2");
+                    case "gemeenten_maand":
+                        data = yield this.bucket.readFile(year + "/" + week + "/gemeenten_maand.csv");
+                        data = (0, csv_factory_1.csvToArray)(data, ",");
+                        data = (0, clean_1.cleanGemeenten)(data);
+                        yield this.postgres.bulkInsert(data, "gemeenten_maand", db, "db2");
+                        break;
+                    case "regelingen_week":
+                        data = yield this.bucket.readFile(year + "/" + week + "/regelingen_week.csv");
+                        data = (0, csv_factory_1.csvToArray)(data, ",");
+                        cleaned_data = (0, clean_1.cleanZaaktypes)(data);
+                        yield this.postgres.bulkInsert(cleaned_data, "regelingen_week", db, "db2");
+                        break;
+                    case "regelingen_maand":
+                        data = yield this.bucket.readFile(year + "/" + week + "/regelingen_maand.csv");
+                        data = (0, csv_factory_1.csvToArray)(data, ",");
+                        cleaned_data = (0, clean_1.cleanZaaktypes)(data);
+                        yield this.postgres.bulkInsert(cleaned_data, "regelingen_maand", db, "db2");
                         break;
                 }
                 return {
-                    msg: "data entry completed successfull"
+                    msg: "data entry completed successfull",
                 };
             }
             catch (err) {
                 return {
-                    err
+                    err,
                 };
             }
         });
@@ -81,61 +94,61 @@ class DataController {
                 const year = 2025;
                 let data;
                 let date;
-                console.log('starting data entry for ' + topic);
-                console.log('week: ' + week);
+                console.log("starting data entry for " + topic);
+                console.log("week: " + week);
                 switch (topic) {
-                    case 'ves':
-                        data = yield this.bucket.readFile(year + '/' + week + '/ves.csv');
+                    case "ves":
+                        data = yield this.bucket.readFile(year + "/" + week + "/ves.csv");
                         data = (0, csv_factory_1.csvToArray)(data, ",");
                         data = (0, ves_factory_1.cleanVes)(data, date);
-                        yield this.postgres.bulkInsert(data, 'ves', db, "db1");
+                        yield this.postgres.bulkInsert(data, "ves", db, "db1");
                         break;
-                    case 'fs':
-                        data = yield this.bucket.readFile(year + '/' + week + '/fs.csv');
+                    case "fs":
+                        data = yield this.bucket.readFile(year + "/" + week + "/fs.csv");
                         data = (0, csv_factory_1.csvToArray)(data, ",");
                         data = (0, fs_factory_1.cleanFs)(data);
-                        yield this.postgres.bulkInsert(data, 'fysieke_schade', db, "db1");
+                        yield this.postgres.bulkInsert(data, "fysieke_schade", db, "db1");
                         break;
-                    // case 'mms': 
+                    // case 'mms':
                     //     data = await this.bucket.readFile(year + '/' + week + '/mms.csv');
                     //     data = csvToArray(data,";");
                     //     data = parseMmsHistory(data);
                     //     writeFileSync("/tmp/" + topic + ".csv", arrayToCsv(data));
                     //     this.postgres.importCsv(db, topic);
                     //     break;
-                    case 'kto':
-                        data = yield this.bucket.readXlxs(year + '/' + week + '/kto.xlsx');
-                        date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ? 
+                    case "kto":
+                        data = yield this.bucket.readXlxs(year + "/" + week + "/kto.xlsx");
+                        date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ?
                         data = (0, kto_factory_1.parseKto)(data, date);
-                        yield this.postgres.bulkInsert([data], 'tevredenheidscijfers', db, "db1");
+                        yield this.postgres.bulkInsert([data], "tevredenheidscijfers", db, "db1");
                         break;
-                    case 'wdims':
-                        data = yield this.bucket.readXlxs(year + '/' + week + '/wdims.xlsx');
-                        date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ? 
+                    case "wdims":
+                        data = yield this.bucket.readXlxs(year + "/" + week + "/wdims.xlsx");
+                        date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ?
                         const imsData = (0, ims_factory_1.parseIms)(data, date, parseInt(week));
                         const wdData = (0, wd_factory_1.parseWd)(data, date, parseInt(week));
-                        yield this.postgres.bulkInsert([imsData], 'immateriele_schade', db, "db1");
-                        yield this.postgres.bulkInsert([wdData], 'waardedalingsregeling', db, "db1");
+                        yield this.postgres.bulkInsert([imsData], "immateriele_schade", db, "db1");
+                        yield this.postgres.bulkInsert([wdData], "waardedalingsregeling", db, "db1");
                         break;
                 }
                 return {
-                    msg: "data entry completed successfull"
+                    msg: "data entry completed successfull",
                 };
             }
             catch (err) {
                 return {
-                    err
+                    err,
                 };
             }
         });
     }
     all(week, db) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.entry(week, 'ves', db);
-            yield this.entry(week, 'fs', db);
-            yield this.entry(week, 'mms', db);
-            yield this.entry(week, 'kto', db);
-            yield this.entry(week, 'wdims', db);
+            yield this.entry(week, "ves", db);
+            yield this.entry(week, "fs", db);
+            yield this.entry(week, "mms", db);
+            yield this.entry(week, "kto", db);
+            yield this.entry(week, "wdims", db);
         });
     }
     validate(jaar_week, topic) {
@@ -144,13 +157,13 @@ class DataController {
             const week = jaar_week.split("_")[1];
             let data;
             switch (topic) {
-                case 'gemeenten':
-                    data = yield this.bucket.readFile(year + '/' + week + '/gemeenten.csv');
+                case "gemeenten":
+                    data = yield this.bucket.readFile(year + "/" + week + "/gemeenten.csv");
                     data = (0, csv_factory_1.csvToArray)(data, ",");
                     data = (0, clean_1.cleanGemeenten)(data);
                     break;
-                case 'zaaktypes':
-                    data = yield this.bucket.readFile(year + '/' + week + '/zaaktypes.csv');
+                case "zaaktypes":
+                    data = yield this.bucket.readFile(year + "/" + week + "/zaaktypes.csv");
                     data = (0, csv_factory_1.csvToArray)(data, ",");
                     data = (0, clean_1.cleanGemeenten)(data);
                     break;
