@@ -107,6 +107,7 @@ class DataController {
                         data = yield this.bucket.readFile(year + "/" + week + "/fs.csv");
                         data = (0, csv_factory_1.csvToArray)(data, ",");
                         data = (0, fs_factory_1.cleanFs)(data);
+                        console.log(data);
                         yield this.postgres.bulkInsert(data, "fysieke_schade", db, "db1");
                         break;
                     // case 'mms':

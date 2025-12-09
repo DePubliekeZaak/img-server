@@ -30,8 +30,6 @@ export const parseIms = (data: any, date: Date, week: number) => {
   const rows = data[0].data;
   const column = rows[0].indexOf("Week " + week.toString());
 
-  console.log(1);
-
   object["pc4"] = "-";
   object["ingediend"] = parseInt(
     rowByDesc(rows, "ims", "Totaal ingediende aanvragen")[column],
@@ -150,7 +148,7 @@ export const parseIms = (data: any, date: Date, week: number) => {
       ],
     ) | 0;
 
-  // console.log(object);
+  console.log(object);
 
   return object;
 };

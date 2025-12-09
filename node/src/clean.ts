@@ -146,7 +146,7 @@ export const cleanGemeenten = (data: any) => {
       } else if (["laad_dt"].indexOf(key) > -1) {
         r[slugify(key)] = value === "" ? null : value.split("T")[0];
       } else if (key.endsWith("_eur")) {
-        r[slugify(key)] = value;
+        r[slugify(key)] = value === "" || value === null || value === undefined ? null : value;
       } else if (key.endsWith("_aantal") || key.endsWith("_cumul")) {
         r[slugify(key)] = value === "" || value === null ? 0 : parseInt(value);
       } else {

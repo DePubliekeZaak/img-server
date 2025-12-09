@@ -136,6 +136,7 @@ export class DataController implements IDataController {
           data = await this.bucket.readFile(year + "/" + week + "/fs.csv");
           data = csvToArray(data, ",");
           data = cleanFs(data);
+          console.log(data);
           await this.postgres.bulkInsert(data, "fysieke_schade", db, "db1");
 
           break;
