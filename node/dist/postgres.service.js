@@ -168,6 +168,13 @@ class PostgresService {
                     }
                     return `${intValue}::INTEGER`;
                 }
+                if (key === "beslistermijn_dagen") {
+                    const numValue = Number(value);
+                    if (isNaN(numValue)) {
+                        return "0::INTEGER";
+                    }
+                    return `${Math.ceil(numValue - 0.5)}::INTEGER`;
+                }
                 return String(value);
             };
             // Process in larger chunks for better performance
