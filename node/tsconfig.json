@@ -3,9 +3,14 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
-  },
-  "lib": ["es2015"]
+    "outDir": "dist",
+    "rootDir": "src",
+    "lib": ["es2020"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "noImplicitThis": false
+  }
 }

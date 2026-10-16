@@ -15,10 +15,6 @@ const bucket_service_1 = require("./bucket.service");
 const redis_service_1 = require("./redis.service");
 const csv_factory_1 = require("./csv.factory");
 const kto_factory_1 = require("./kto.factory");
-const wd_factory_1 = require("./wd.factory");
-const ims_factory_1 = require("./ims.factory");
-const fs_factory_1 = require("./fs.factory");
-const ves_factory_1 = require("./ves.factory");
 const date_factory_1 = require("./date.factory");
 const history_factory_1 = require("./history.factory");
 const validate_1 = require("./validate");
@@ -91,45 +87,17 @@ class DataController {
     entry(week, topic, db) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const year = 2025;
+                const year = 2026;
                 let data;
                 let date;
                 console.log("starting data entry for " + topic);
                 console.log("week: " + week);
                 switch (topic) {
-                    case "ves":
-                        data = yield this.bucket.readFile(year + "/" + week + "/ves.csv");
-                        data = (0, csv_factory_1.csvToArray)(data, ",");
-                        data = (0, ves_factory_1.cleanVes)(data, date);
-                        yield this.postgres.bulkInsert(data, "ves", db, "db1");
-                        break;
-                    case "fs":
-                        data = yield this.bucket.readFile(year + "/" + week + "/fs.csv");
-                        data = (0, csv_factory_1.csvToArray)(data, ",");
-                        data = (0, fs_factory_1.cleanFs)(data);
-                        console.log(data);
-                        yield this.postgres.bulkInsert(data, "fysieke_schade", db, "db1");
-                        break;
-                    // case 'mms':
-                    //     data = await this.bucket.readFile(year + '/' + week + '/mms.csv');
-                    //     data = csvToArray(data,";");
-                    //     data = parseMmsHistory(data);
-                    //     writeFileSync("/tmp/" + topic + ".csv", arrayToCsv(data));
-                    //     this.postgres.importCsv(db, topic);
-                    //     break;
                     case "kto":
                         data = yield this.bucket.readXlxs(year + "/" + week + "/kto.xlsx");
                         date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ?
                         data = (0, kto_factory_1.parseKto)(data, date);
-                        yield this.postgres.bulkInsert([data], "tevredenheidscijfers", db, "db1");
-                        break;
-                    case "wdims":
-                        data = yield this.bucket.readXlxs(year + "/" + week + "/wdims.xlsx");
-                        date = (0, date_factory_1.nextMondayFromWeek)(week, year); // from fileName ?
-                        const imsData = (0, ims_factory_1.parseIms)(data, date, parseInt(week));
-                        const wdData = (0, wd_factory_1.parseWd)(data, date, parseInt(week));
-                        yield this.postgres.bulkInsert([imsData], "immateriele_schade", db, "db1");
-                        yield this.postgres.bulkInsert([wdData], "waardedalingsregeling", db, "db1");
+                        yield this.postgres.bulkInsert([data], "tevredenheidscijfers", db, "db2");
                         break;
                 }
                 return {

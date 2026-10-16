@@ -74,7 +74,7 @@ class PostgresService {
                 "dlt_verwacht_gemiddeld",
                 "dlt_verwacht_mediaan",
                 "bz_percentage",
-                "dlt_verwacht_rolling8",
+                "bz_vertraagd_jaar_perc",
                 "dlt_gerealiseerd_gemiddeld",
                 "dlt_gerealiseerd_mediaan",
                 "beschikt_binn_termijn_perc",
@@ -83,8 +83,8 @@ class PostgresService {
                 "bz_cumul_perc",
             ]);
             const averageFields = new Set([
-                "ouderdom_voorraad_gemiddeld",
-                "ouderdom_voorraad_mediaan",
+                "oud_voorraad_gemiddeld_dagen",
+                "oud_voorraad_mediaan_dagen"
             ]);
             // Helper function to format value based on field type
             const formatValue = (key, value) => {
@@ -175,7 +175,12 @@ class PostgresService {
                     }
                     return `${Math.ceil(numValue - 0.5)}::INTEGER`;
                 }
-                return String(value);
+                if (value === null ||
+                    value === undefined ||
+                    String(value).trim().toLowerCase() === "null") {
+                    return "NULL";
+                }
+                return `'${String(value).replace(/\r/g, "").replace(/'/g, "''")}'`;
             };
             // Process in larger chunks for better performance
             const chunkSize = 48;
@@ -250,7 +255,7 @@ class PostgresService {
                 "-f",
                 path,
                 "--host",
-                "db1",
+                "db2",
                 "--dbname",
                 db,
                 "--username",
@@ -265,7 +270,7 @@ class PostgresService {
             const bin = "psql";
             const args = [
                 "--host",
-                "db1",
+                "db2",
                 "--username",
                 "postgres",
                 "-d",
@@ -289,7 +294,7 @@ class PostgresService {
         `;
             const args = [
                 "--host",
-                "db1",
+                "db2",
                 "--username",
                 "postgres",
                 "-d",
@@ -300,7 +305,7 @@ class PostgresService {
             return yield this.childProcess(bin, args);
         });
     }
-    runPsql(cmd, db, instance = "db1") {
+    runPsql(cmd, db, instance = "db2") {
         return __awaiter(this, void 0, void 0, function* () {
             let success = false;
             const bin = "psql";

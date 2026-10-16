@@ -118,36 +118,14 @@ export class DataController implements IDataController {
 
   async entry(week: string, topic: string, db: string) {
     try {
-      const year = 2025;
+      const year = 2026;
       let data: any;
       let date: Date;
       console.log("starting data entry for " + topic);
       console.log("week: " + week);
 
       switch (topic) {
-        case "ves":
-          data = await this.bucket.readFile(year + "/" + week + "/ves.csv");
-          data = csvToArray(data, ",");
-          data = cleanVes(data, date);
-          await this.postgres.bulkInsert(data, "ves", db, "db1");
-          break;
-
-        case "fs":
-          data = await this.bucket.readFile(year + "/" + week + "/fs.csv");
-          data = csvToArray(data, ",");
-          data = cleanFs(data);
-          console.log(data);
-          await this.postgres.bulkInsert(data, "fysieke_schade", db, "db1");
-
-          break;
-
-        // case 'mms':
-        //     data = await this.bucket.readFile(year + '/' + week + '/mms.csv');
-        //     data = csvToArray(data,";");
-        //     data = parseMmsHistory(data);
-        //     writeFileSync("/tmp/" + topic + ".csv", arrayToCsv(data));
-        //     this.postgres.importCsv(db, topic);
-        //     break;
+   
 
         case "kto":
           data = await this.bucket.readXlxs(year + "/" + week + "/kto.xlsx");
@@ -157,28 +135,7 @@ export class DataController implements IDataController {
             [data],
             "tevredenheidscijfers",
             db,
-            "db1",
-          );
-          break;
-
-        case "wdims":
-          data = await this.bucket.readXlxs(year + "/" + week + "/wdims.xlsx");
-
-          date = nextMondayFromWeek(week, year); // from fileName ?
-
-          const imsData = parseIms(data, date, parseInt(week));
-          const wdData = parseWd(data, date, parseInt(week));
-          await this.postgres.bulkInsert(
-            [imsData],
-            "immateriele_schade",
-            db,
-            "db1",
-          );
-          await this.postgres.bulkInsert(
-            [wdData],
-            "waardedalingsregeling",
-            db,
-            "db1",
+            "db2",
           );
           break;
       }

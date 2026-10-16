@@ -5,3 +5,8 @@ node/node_modules
 node/package-lock.json
 cli/node_modules
 
+
+# generated tsc output (nested) — only the flat node/dist/*.js is tracked
+node/dist/src/
+# personal VS Code workspace
+node/src/*.code-workspace

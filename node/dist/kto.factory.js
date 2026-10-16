@@ -12,8 +12,16 @@ const parseKto = (data, date) => {
         datum: (0, date_factory_1.formatDate)(date),
         gemeente: 'all'
     };
-    // let op .. er zit soms een extra kolom tussen, zoals E 
-    data[0].data.forEach((row, index) => {
+    const rows = data[0].data;
+    // Dynamically find the IMKJ "sep MTD" header row
+    let imkjHeaderRow = -1;
+    for (let i = 0; i < rows.length; i++) {
+        if (rows[i] && typeof rows[i][0] === 'string' && rows[i][0].trim().toLowerCase() === 'IMKJ') {
+            imkjHeaderRow = i;
+            break;
+        }
+    }
+    rows.forEach((row, index) => {
         switch (index) {
             case 2:
             case 3:
@@ -67,25 +75,22 @@ const parseKto = (data, date) => {
                 object["ims_maand_gem"] = parseFloat(row[13]);
                 object["ims_maand_n"] = parseInt(row[14]);
                 break;
-            case 45:
-            case 46:
-            case 47:
-            case 48:
-            case 49:
-            case 50:
-            case 51:
-            case 52:
-            case 53:
-            case 54:
-                object["imkj_doorlopend_" + row[1]] = parseInt(row[6]);
-                object["imkj_maand_" + row[1]] = parseInt(row[2]);
-                break;
-            case 55:
+        }
+        // Handle IMKJ section dynamically (replaces hardcoded cases 45-55)
+        if (imkjHeaderRow >= 0) {
+            const dataStart = imkjHeaderRow + 3;
+            if (index >= dataStart && index < dataStart + 10) {
+                if (row[1] != null) {
+                    object["imkj_doorlopend_" + row[1]] = parseInt(row[6]);
+                    object["imkj_maand_" + row[1]] = parseInt(row[2]);
+                }
+            }
+            if (index === dataStart + 10) {
                 object["imkj_maand_gem"] = parseFloat(row[1]) || 0;
-                object["imkj_maand_n"] = parseInt(row[2]);
-                object["imkj_doorlopend_gem"] = parseFloat(row[5]);
-                object["imkj_doorlopend_n"] = parseInt(row[6]);
-                break;
+                object["imkj_maand_n"] = parseInt(row[2]) || 0;
+                object["imkj_doorlopend_gem"] = parseFloat(row[5]) || 0;
+                object["imkj_doorlopend_n"] = parseInt(row[6]) || 0;
+            }
         }
     });
     console.log(object);
