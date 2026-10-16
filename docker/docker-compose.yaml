@@ -1,122 +1,136 @@
 version: "3.7"
+# Consolidated compose after migrating db1 (postgres 15) into db2 (postgres 17).
+#
+# WHAT CHANGED vs the previous 15-service stack:
+#   - removed  db1       (old postgres 15 install; its `public` db was migrated to db2 as `img_v001`)
+#   - removed  pgadmin1  (admin UI for the removed db1; its nginx upstream was already unused)
+#   - removed  server1   (dead `live-api` upstream - no nginx location ever references it)
+#   - removed  staging-server1 / dev-server1 / v1-api / swagger1
+#               (restore + re-add the matching nginx location/upstream if still needed)
+#   - restored archive-v100-api  -> db2:img_v100  (v100 archive, port 3004)
+#   - repointed archive-v0-api  -> db2:img_v001  (the old truth, structure preserved)
+#   - repointed public-server1  -> db2:img_v001  (old publiek selection - see note)
+#   - dropped unused `links:` (service DNS on the `img` network is enough)
+#   - dropped orphan volumes db-data, pgadmin-data, nginx from the volume list
+#
+# DECISIONS STILL OPEN (flip before deploying):
+#   - public-server1: currently pointed at img_v001 (= today's behavior, old data).
+#     Point it at db2's `public` db (the live database, same one v2-api serves)
+#     instead if /publieke-data/ should serve live data.
+#   - staging / dev / new dashboards: uncomment the services below if still used.
+
 services:
 
-  nginx1:
-    image: custom_nginx
-    container_name: nginx1
-    build:
-      context: ..
-      dockerfile: ./docker/nginx.Dockerfile
-    restart: always
-    volumes:
-      - letsencrypt:/etc/letsencrypt
-      - /var/log/nginx:/var/log/nginx
-      - /srv/img-server/nginx/conf.d/img:/etc/nginx/conf.d/img
-      - /srv/img-server/nginx/conf.d/graphs:/etc/nginx/conf.d/graphs
-      - /var/www/html:/var/www/html
-    environment:
-      - DOMAIN=${DOMAIN}
-      - DOMAIN2=${DOMAIN2}
-    command: /bin/sh -c "envsubst < /etc/nginx/conf.d/_server.conf.template > /etc/nginx/conf.d/_server.conf && nginx -g 'daemon off;'"
-    ports:
-      - 80:80
-      - 443:443
-    networks:
-      - img
+  # NOTE: nginx now runs ON THE HOST, not in a container.
+  # Config lives in nginx/ (nginx/setup.sh installs it); host nginx proxies
+  # to these services on 127.0.0.1 loopback ports and serves /var/www/html
+  # directly. Ports 80/443 are free for host nginx.
 
-  db1:
-    image: postgres:15
-    container_name: db1
+  # ---- single postgres 17 instance (db1 retired) ----
+  db2:
+    image: postgres:17
+    container_name: db2
     restart: always
     environment:
-      POSTGRES_DB: img
+      POSTGRES_DB: img_2521
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       PGDATA: /var/lib/postgresql/data
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data2:/var/lib/postgresql/data
       - files:/tmp
     networks:
       - img
 
-  pgadmin1:
-    image: dpage/pgadmin4:6
-    container_name: pgadmin1
+  pgadmin2:
+    image: dpage/pgadmin4:9
+    container_name: pgadmin2
     restart: always
+    ports:
+      - "127.0.0.1:8081:8080"   # host nginx proxies /pgadmin2/ here
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-      PGADMIN_LISTEN_PORT: 8080  
+      PGADMIN_LISTEN_PORT: 8080
+      PGADMIN_CONFIG_PROXY_X_HEADERS: 'True'
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmin-data2:/var/lib/pgadmin
     networks:
       - img
 
-  server1:
-    image: postgrest/postgrest:v10.1.1
-    container_name: server1
-    links:
-      - "db1:db1"
+  # ---- live / latest API (db2:public, new structure) ----
+  v2-api:
+    image: postgrest/postgrest:v12.2.12
+    container_name: v2-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:3000"   # host nginx proxies /open-data/api/ here
+    depends_on:
+      - db2
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${PUBLIC}
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/public
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
-    depends_on:
-      - db1
     networks:
       - img
 
-  staging-server1:
+  # ---- v001 archive = the old truth, migrated db1.public -> db2:img_v001 ----
+  archive-v0-api:
     image: postgrest/postgrest:v10.1.1
-    container_name: staging-server1
-    links:
-      - "db1:db1"
-    environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${STAGING}
-      PGRST_DB_SCHEMA: api
-      PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    container_name: archive-v0-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"   # host nginx proxies /open-data/archives/v001/api/ here
     depends_on:
-      - db1
+      - db2
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v001
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon
     networks:
       - img
 
-  dev-server1:
+  # ---- v100 archive: db2:img_v100 (restored - was part of the old fleet) ----
+  archive-v100-api:
     image: postgrest/postgrest:v10.1.1
-    container_name: dev-server1
-    links:
-      - "db1:db1"
-    environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${DEV}
-      PGRST_DB_SCHEMA: api
-      PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    container_name: archive-v100-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3004:3000"   # host nginx proxies /open-data/archives/v100/api/ here
     depends_on:
-      - db1
+      - db2
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v100
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon
     networks:
       - img
 
+  # ---- publieke-data: smaller public selection, old structure ----
   public-server1:
     image: postgrest/postgrest:v10.1.1
     container_name: public-server1
-    links:
-      - "db1:db1"
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3003:3000"   # host nginx proxies /publieke-data/ here
+    depends_on:
+      - db2
     environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db1:5432/${PUBLIC}
+      # default = img_v001 (old data, = today's behavior). Point at db2's `public`
+      # db (the same live db v2-api serves) for live /publieke-data/.
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v001
       PGRST_DB_SCHEMA: publiek
       PGRST_DB_ANON_ROLE: web_anon
-    depends_on:
-      - db1
     networks:
       - img
 
+  # swagger docs UI - /publieke-data/docs/ (referenced by frontend nav.service.ts)
   swagger1:
     image: swaggerapi/swagger-ui
     container_name: swagger1
-    expose:
-      - "8080"
-    depends_on:
-      - server1
-    links:
-      - server1:server
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8082:8080"   # host nginx proxies /publieke-data/docs/ here
     environment:
       SWAGGER_JSON: /json/swagger.json
     volumes:
@@ -124,24 +138,23 @@ services:
     networks:
       - img
 
-  node:
+  importer:
     image: custom_node
-    container_name: node
+    container_name: importer
+    restart: unless-stopped
     build:
       context: ..
       dockerfile: ./docker/node.Dockerfile
-    ports: 
-      - "3009:3009"
+    ports:
+      - "127.0.0.1:3009:3009"
     volumes:
       - files:/tmp
     networks:
       - img
 
 volumes:
-  db-data:
-  pgadmin-data:
-  nginx:
-  letsencrypt:
+  db-data2:
+  pgadmin-data2:
   files:
 
 networks:
