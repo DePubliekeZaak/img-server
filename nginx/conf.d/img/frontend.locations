@@ -1,72 +1,39 @@
-    location /frontend/staging/ {
-	  
-        alias /var/www/html/staging/;
-    
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+location /frontend/newest/ {
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-    }
+	alias /var/www/html/newest/;
 
-    location /frontend/dev/ {
-	  
-        alias /var/www/html/dev/;
-    
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+	location ~* \.(js|css)$ {
+		try_files $uri /dev/null =404;
+	}
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-    }
+	location ~* \.(eot|otf|ttf|woff|woff2)$ {
+		add_header Access-Control-Allow-Origin *;
+		expires max;
+	}
+}
 
-     location /frontend/new/ {
-	  
-        alias /var/www/html/new/;
-    
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+location /graphs/ {
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-    }
+	alias /var/www/html/production/;
 
-    location /graphs/ {
+	location ~* \.(js|css)$ {
+		try_files $uri /dev/null =404;
+		add_header Cache-Control "private";
+		etag on;
+	}
 
-        alias /var/www/html/production/;
+	location ~* \.(eot|otf|ttf|woff|woff2)$ {
+		add_header Access-Control-Allow-Origin *;
+		expires max;
+	}
+}
 
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-            add_header Cache-Control "private";
-		    etag on;
-        }
+location /geojson/ {
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-        
-        
-    }
+	alias /var/www/html/geojson/;
 
-    location /geojson/ {
-
-        alias /var/www/html/geojson/;
-
-        location ~* \.(geojson|topojson)$ {
-            add_header 'Access-Control-Allow-Origin' '*';
-            add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
-        }
-    }
-
-	
-    
+	location ~* \.(geojson|topojson)$ {
+		add_header 'Access-Control-Allow-Origin' '*';
+		add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
+	}
+}

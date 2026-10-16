@@ -1,37 +1,25 @@
-    location /staging/ {
-	  
-        alias /var/www/html/staging/;
-    
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+location /graphs/ {
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-    }
+	add_header Access-Control-Allow-Origin *;
+	add_header Access-Control-Allow-Methods 'GET, OPTIONS';
 
-    location /dev/ {
-	  
-        alias /var/www/html/dev/;
-    
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+	alias /var/www/html/production/;
+	location ~* \.(js|css)$ {
+		add_header Access-Control-Allow-Origin *;
+		add_header Cache-Control "no-cache, must-revalidate";
+		try_files $uri /dev/null =404;
+	}
+}
 
-        location ~* \.(eot|otf|ttf|woff|woff2)$ {
-            add_header Access-Control-Allow-Origin *;
-            expires max; 
-        }
-    }
+# v001 archive dashboard bundle (frontend loads graphs.publikaan.nl/v001/scripts/dashboard-bundle.js)
+location /v001/ {
 
-    location /graphs/ {
-        
-        alias /var/www/html/production/;
-        location ~* \.(js|css)$ {
-            try_files $uri /dev/null =404;
-        }
+	add_header Access-Control-Allow-Origin *;
+	add_header Access-Control-Allow-Methods 'GET, OPTIONS';
 
-    }
-    
+	alias /var/www/html/v001/;
+	location ~* \.(js|css)$ {
+		add_header Access-Control-Allow-Origin *;
+		try_files $uri /dev/null =404;
+	}
+}

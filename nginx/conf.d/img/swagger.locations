@@ -1,7 +1,15 @@
-	location /publieke-data/docs/ {
-          proxy_pass http://swagger/;
-          proxy_http_version 1.1; 
-          proxy_set_header Upgrade $http_upgrade;
-          proxy_set_header Connection 'upgrade';
-	}
+# swagger docs - keep (frontend nav.service.ts links to /publieke-data/docs/)
+# Pen-test hardening: GET-only, timeout, rate-limited, no websocket headers.
+location /publieke-data/docs/ {
 
+	limit_except GET {
+		deny all;
+	}
+	client_max_body_size 1k;
+	proxy_read_timeout 30s;
+	proxy_hide_header X-Powered-By;
+	limit_req zone=api burst=20 nodelay;
+
+	proxy_pass http://swagger/;
+	proxy_http_version 1.1;
+}

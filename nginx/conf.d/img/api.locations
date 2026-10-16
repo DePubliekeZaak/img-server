@@ -1,35 +1,47 @@
-  location /open-data/api/ {
+# Live API proxies -> PostgREST. Pen-test hardening:
+#   - GET-only (the app only reads; PostgREST writes are never proxied here)
+#   - 1k body limit (defence-in-depth on top of limit_except)
+#   - read timeout, hide upstream X-Powered-By, no websocket headers (REST only)
+#   - rate-limited via the `api` zone defined in nginx.conf
+location /open-data/api/ {
 
-    proxy_pass http://live-api/;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-    proxy_max_temp_file_size 0;
-  }
-
-	location /open-data/staging/api/ {
-			
-	  proxy_pass http://staging-api/;  
-    proxy_http_version 1.1;  
-    proxy_set_header Upgrade $http_upgrade;  
-    proxy_set_header Connection 'upgrade';
+	limit_except GET {
+		deny all;
 	}
+	client_max_body_size 1k;
+	proxy_read_timeout 30s;
+	proxy_hide_header X-Powered-By;
+	limit_req zone=api burst=20 nodelay;
 
-  location /open-data/dev/api/ {
-			
-	  proxy_pass http://dev-api/;  
-    proxy_http_version 1.1;  
-    proxy_set_header Upgrade $http_upgrade;  
-    proxy_set_header Connection 'upgrade';
+	proxy_pass http://v2-api/;
+	proxy_http_version 1.1;
+	proxy_max_temp_file_size 0;
+}
+
+location /open-data/archives/v001/api/ {
+
+	limit_except GET {
+		deny all;
 	}
+	client_max_body_size 1k;
+	proxy_read_timeout 30s;
+	proxy_hide_header X-Powered-By;
+	limit_req zone=api burst=20 nodelay;
 
+	proxy_pass http://archive-v0-api/;
+	proxy_http_version 1.1;
+}
 
-	location /publieke-data/ {
+location /publieke-data/ {
 
-	  proxy_pass http://public-api/;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection 'upgrade';
-
+	limit_except GET {
+		deny all;
 	}
-	
+	client_max_body_size 1k;
+	proxy_read_timeout 30s;
+	proxy_hide_header X-Powered-By;
+	limit_req zone=api burst=20 nodelay;
+
+	proxy_pass http://public-api/;
+	proxy_http_version 1.1;
+}

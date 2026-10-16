@@ -1,8 +1,17 @@
-	location /pgadmin4/ {
-        
-		proxy_pass http://pgadmin/;
-		proxy_set_header X-Script-Name /pgadmin4;
-		proxy_set_header X-Scheme $scheme;
-		proxy_set_header Host $host;
-		proxy_redirect off; 
-	}
+location /pgadmin2/ {
+
+	# pen-test window: home + office allowed while migration work is ongoing.
+	# RE-LOCK BEFORE THE PEN TEST: comment the office line below again.
+	allow 94.208.77.77;  # baarsjes (office)
+	allow 62.166.178.42; # home
+	deny all;
+	add_header X-Content-Type-Options "nosniff" always;
+	proxy_pass http://pgadmin2/;
+	proxy_set_header X-Script-Name /pgadmin2;
+	proxy_set_header X-Scheme $scheme;
+	proxy_set_header Host $host;
+	proxy_redirect off;
+	proxy_set_header X-Real-IP $remote_addr;
+	proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	proxy_set_header X-Forwarded-Proto $scheme;
+}
