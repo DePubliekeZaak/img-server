@@ -13,3 +13,4 @@ node/src/*.code-workspace
 
 # root package manager artifacts
 node_modules/
+package-lock.json
