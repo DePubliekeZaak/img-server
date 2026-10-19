@@ -1,6 +1,6 @@
-location /frontend/newest/ {
+location /frontend/dev/ {
 
-	alias /var/www/html/newest/;
+	alias /var/www/html/dev/;
 
 	location ~* \.(js|css)$ {
 		try_files $uri /dev/null =404;

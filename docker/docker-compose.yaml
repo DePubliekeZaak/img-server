@@ -59,9 +59,9 @@ services:
       - img
 
   # ---- live / latest API (db2:public, new structure) ----
-  v2-api:
+  live-api:
     image: postgrest/postgrest:v12.2.12
-    container_name: v2-api
+    container_name: live-api
     restart: unless-stopped
     ports:
       - "127.0.0.1:3001:3000"   # host nginx proxies /open-data/api/ here
@@ -71,6 +71,39 @@ services:
       PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/public
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: web_anon #In production this role should not be the same as the one used for the connection
+    networks:
+      - img
+
+    # ---- live / latest API (db2:public, new structure) ----
+  staging-api:
+    image: postgrest/postgrest:v12.2.12
+    container_name: staging-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3030:3000"  
+    depends_on:
+      - db2
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/staging
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon 
+    networks:
+      - img
+
+
+  # ---- v100 archive: db2:img_v100 (restored - was part of the old fleet) ----
+  archive-v100-api:
+    image: postgrest/postgrest:v10.1.1
+    container_name: archive-v100-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3004:3000"   # host nginx proxies /open-data/archives/v100/api/ here
+    depends_on:
+      - db2
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v100
+      PGRST_DB_SCHEMA: api
+      PGRST_DB_ANON_ROLE: web_anon
     networks:
       - img
 
@@ -85,22 +118,6 @@ services:
       - db2
     environment:
       PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v001
-      PGRST_DB_SCHEMA: api
-      PGRST_DB_ANON_ROLE: web_anon
-    networks:
-      - img
-
-  # ---- v100 archive: db2:img_v100 (restored - was part of the old fleet) ----
-  archive-v100-api:
-    image: postgrest/postgrest:v10.1.1
-    container_name: archive-v100-api
-    restart: unless-stopped
-    ports:
-      - "127.0.0.1:3004:3000"   # host nginx proxies /open-data/archives/v100/api/ here
-    depends_on:
-      - db2
-    environment:
-      PGRST_DB_URI: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db2:5432/img_v100
       PGRST_DB_SCHEMA: api
       PGRST_DB_ANON_ROLE: web_anon
     networks:

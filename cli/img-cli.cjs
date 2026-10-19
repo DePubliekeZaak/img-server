@@ -7,7 +7,11 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -1156,11 +1160,11 @@ var require_agent = __commonJS({
     var http22 = require("http2");
     var QuickLRU = require_quick_lru();
     var delayAsyncDestroy = require_delay_async_destroy();
-    var kCurrentStreamCount = Symbol("currentStreamCount");
-    var kRequest = Symbol("request");
-    var kOriginSet = Symbol("cachedOriginSet");
-    var kGracefullyClosing = Symbol("gracefullyClosing");
-    var kLength = Symbol("length");
+    var kCurrentStreamCount = /* @__PURE__ */ Symbol("currentStreamCount");
+    var kRequest = /* @__PURE__ */ Symbol("request");
+    var kOriginSet = /* @__PURE__ */ Symbol("cachedOriginSet");
+    var kGracefullyClosing = /* @__PURE__ */ Symbol("gracefullyClosing");
+    var kLength = /* @__PURE__ */ Symbol("length");
     var nameKeys = [
       // Not an Agent option actually
       "createConnection",
@@ -1980,13 +1984,13 @@ var require_client_request = __commonJS({
       HTTP2_HEADER_AUTHORITY,
       HTTP2_METHOD_CONNECT
     } = http22.constants;
-    var kHeaders = Symbol("headers");
-    var kOrigin = Symbol("origin");
-    var kSession = Symbol("session");
-    var kOptions = Symbol("options");
-    var kFlushedHeaders = Symbol("flushedHeaders");
-    var kJobs = Symbol("jobs");
-    var kPendingAgentPromise = Symbol("pendingAgentPromise");
+    var kHeaders = /* @__PURE__ */ Symbol("headers");
+    var kOrigin = /* @__PURE__ */ Symbol("origin");
+    var kSession = /* @__PURE__ */ Symbol("session");
+    var kOptions = /* @__PURE__ */ Symbol("options");
+    var kFlushedHeaders = /* @__PURE__ */ Symbol("flushedHeaders");
+    var kJobs = /* @__PURE__ */ Symbol("jobs");
+    var kPendingAgentPromise = /* @__PURE__ */ Symbol("pendingAgentPromise");
     var ClientRequest = class extends Writable {
       constructor(input, options, callback) {
         super({
@@ -2945,7 +2949,7 @@ var require_source2 = __commonJS({
 // node_modules/node-version/index.js
 var require_node_version = __commonJS({
   "node_modules/node-version/index.js"(exports2, module2) {
-    module2.exports = function() {
+    module2.exports = (function() {
       var version = process.versions.node;
       var split = version.split(".");
       return {
@@ -2956,7 +2960,7 @@ var require_node_version = __commonJS({
         minor: split[1],
         build: split[2]
       };
-    }();
+    })();
   }
 });
 
@@ -4058,7 +4062,7 @@ var require_resolveCommand = __commonJS({
 var require_hasBrokenSpawn = __commonJS({
   "node_modules/cross-spawn/lib/hasBrokenSpawn.js"(exports2, module2) {
     "use strict";
-    module2.exports = function() {
+    module2.exports = (function() {
       if (process.platform !== "win32") {
         return false;
       }
@@ -4066,7 +4070,7 @@ var require_hasBrokenSpawn = __commonJS({
         return parseInt(num, 10);
       });
       return nodeVer[0] === 0 && nodeVer[1] < 12;
-    }();
+    })();
   }
 });
 
@@ -4643,7 +4647,7 @@ var require_lib = __commonJS({
 var require_ChildProcessPromise2 = __commonJS({
   "node_modules/child-process-promise/lib-es5/ChildProcessPromise.js"(exports2, module2) {
     "use strict";
-    var _createClass = /* @__PURE__ */ function() {
+    var _createClass = /* @__PURE__ */ (function() {
       function defineProperties(target, props) {
         for (var i = 0; i < props.length; i++) {
           var descriptor = props[i];
@@ -4658,7 +4662,7 @@ var require_ChildProcessPromise2 = __commonJS({
         if (staticProps) defineProperties(Constructor, staticProps);
         return Constructor;
       };
-    }();
+    })();
     var _get = function get(object, property, receiver) {
       if (object === null) object = Function.prototype;
       var desc = Object.getOwnPropertyDescriptor(object, property);
@@ -4703,7 +4707,7 @@ var require_ChildProcessPromise2 = __commonJS({
     } else {
       Promise2 = require_promise();
     }
-    var ChildProcessPromise = function(_Promise) {
+    var ChildProcessPromise = (function(_Promise) {
       _inherits(ChildProcessPromise2, _Promise);
       function ChildProcessPromise2(executor) {
         _classCallCheck(this, ChildProcessPromise2);
@@ -4755,7 +4759,7 @@ var require_ChildProcessPromise2 = __commonJS({
         }
       }]);
       return ChildProcessPromise2;
-    }(Promise2);
+    })(Promise2);
     ChildProcessPromise.prototype.fail = ChildProcessPromise.prototype.catch;
     module2.exports = ChildProcessPromise;
   }
@@ -4783,7 +4787,7 @@ var require_ChildProcessError2 = __commonJS({
       subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });
       if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
     }
-    var ChildProcessError = function(_Error) {
+    var ChildProcessError = (function(_Error) {
       _inherits(ChildProcessError2, _Error);
       function ChildProcessError2(message, code, childProcess, stdout, stderr) {
         _classCallCheck(this, ChildProcessError2);
@@ -4797,7 +4801,7 @@ var require_ChildProcessError2 = __commonJS({
         return _this;
       }
       return ChildProcessError2;
-    }(Error);
+    })(Error);
     module2.exports = ChildProcessError;
   }
 });
@@ -8337,42 +8341,42 @@ function YargsFactory(_shim) {
     return yargs;
   };
 }
-var kCopyDoubleDash = Symbol("copyDoubleDash");
-var kCreateLogger = Symbol("copyDoubleDash");
-var kDeleteFromParserHintObject = Symbol("deleteFromParserHintObject");
-var kEmitWarning = Symbol("emitWarning");
-var kFreeze = Symbol("freeze");
-var kGetDollarZero = Symbol("getDollarZero");
-var kGetParserConfiguration = Symbol("getParserConfiguration");
-var kGetUsageConfiguration = Symbol("getUsageConfiguration");
-var kGuessLocale = Symbol("guessLocale");
-var kGuessVersion = Symbol("guessVersion");
-var kParsePositionalNumbers = Symbol("parsePositionalNumbers");
-var kPkgUp = Symbol("pkgUp");
-var kPopulateParserHintArray = Symbol("populateParserHintArray");
-var kPopulateParserHintSingleValueDictionary = Symbol("populateParserHintSingleValueDictionary");
-var kPopulateParserHintArrayDictionary = Symbol("populateParserHintArrayDictionary");
-var kPopulateParserHintDictionary = Symbol("populateParserHintDictionary");
-var kSanitizeKey = Symbol("sanitizeKey");
-var kSetKey = Symbol("setKey");
-var kUnfreeze = Symbol("unfreeze");
-var kValidateAsync = Symbol("validateAsync");
-var kGetCommandInstance = Symbol("getCommandInstance");
-var kGetContext = Symbol("getContext");
-var kGetHasOutput = Symbol("getHasOutput");
-var kGetLoggerInstance = Symbol("getLoggerInstance");
-var kGetParseContext = Symbol("getParseContext");
-var kGetUsageInstance = Symbol("getUsageInstance");
-var kGetValidationInstance = Symbol("getValidationInstance");
-var kHasParseCallback = Symbol("hasParseCallback");
-var kIsGlobalContext = Symbol("isGlobalContext");
-var kPostProcess = Symbol("postProcess");
-var kRebase = Symbol("rebase");
-var kReset = Symbol("reset");
-var kRunYargsParserAndExecuteCommands = Symbol("runYargsParserAndExecuteCommands");
-var kRunValidation = Symbol("runValidation");
-var kSetHasOutput = Symbol("setHasOutput");
-var kTrackManuallySetKeys = Symbol("kTrackManuallySetKeys");
+var kCopyDoubleDash = /* @__PURE__ */ Symbol("copyDoubleDash");
+var kCreateLogger = /* @__PURE__ */ Symbol("copyDoubleDash");
+var kDeleteFromParserHintObject = /* @__PURE__ */ Symbol("deleteFromParserHintObject");
+var kEmitWarning = /* @__PURE__ */ Symbol("emitWarning");
+var kFreeze = /* @__PURE__ */ Symbol("freeze");
+var kGetDollarZero = /* @__PURE__ */ Symbol("getDollarZero");
+var kGetParserConfiguration = /* @__PURE__ */ Symbol("getParserConfiguration");
+var kGetUsageConfiguration = /* @__PURE__ */ Symbol("getUsageConfiguration");
+var kGuessLocale = /* @__PURE__ */ Symbol("guessLocale");
+var kGuessVersion = /* @__PURE__ */ Symbol("guessVersion");
+var kParsePositionalNumbers = /* @__PURE__ */ Symbol("parsePositionalNumbers");
+var kPkgUp = /* @__PURE__ */ Symbol("pkgUp");
+var kPopulateParserHintArray = /* @__PURE__ */ Symbol("populateParserHintArray");
+var kPopulateParserHintSingleValueDictionary = /* @__PURE__ */ Symbol("populateParserHintSingleValueDictionary");
+var kPopulateParserHintArrayDictionary = /* @__PURE__ */ Symbol("populateParserHintArrayDictionary");
+var kPopulateParserHintDictionary = /* @__PURE__ */ Symbol("populateParserHintDictionary");
+var kSanitizeKey = /* @__PURE__ */ Symbol("sanitizeKey");
+var kSetKey = /* @__PURE__ */ Symbol("setKey");
+var kUnfreeze = /* @__PURE__ */ Symbol("unfreeze");
+var kValidateAsync = /* @__PURE__ */ Symbol("validateAsync");
+var kGetCommandInstance = /* @__PURE__ */ Symbol("getCommandInstance");
+var kGetContext = /* @__PURE__ */ Symbol("getContext");
+var kGetHasOutput = /* @__PURE__ */ Symbol("getHasOutput");
+var kGetLoggerInstance = /* @__PURE__ */ Symbol("getLoggerInstance");
+var kGetParseContext = /* @__PURE__ */ Symbol("getParseContext");
+var kGetUsageInstance = /* @__PURE__ */ Symbol("getUsageInstance");
+var kGetValidationInstance = /* @__PURE__ */ Symbol("getValidationInstance");
+var kHasParseCallback = /* @__PURE__ */ Symbol("hasParseCallback");
+var kIsGlobalContext = /* @__PURE__ */ Symbol("isGlobalContext");
+var kPostProcess = /* @__PURE__ */ Symbol("postProcess");
+var kRebase = /* @__PURE__ */ Symbol("rebase");
+var kReset = /* @__PURE__ */ Symbol("reset");
+var kRunYargsParserAndExecuteCommands = /* @__PURE__ */ Symbol("runYargsParserAndExecuteCommands");
+var kRunValidation = /* @__PURE__ */ Symbol("runValidation");
+var kSetHasOutput = /* @__PURE__ */ Symbol("setHasOutput");
+var kTrackManuallySetKeys = /* @__PURE__ */ Symbol("kTrackManuallySetKeys");
 var YargsInstance = class {
   constructor(processArgs = [], cwd, parentRequire, shim3) {
     this.customScriptName = false;
@@ -11391,7 +11395,7 @@ function unhandle() {
 }
 
 // node_modules/got/dist/source/core/timed-out.js
-var reentry = Symbol("reentry");
+var reentry = /* @__PURE__ */ Symbol("reentry");
 var noop = () => {
 };
 var TimeoutError2 = class extends Error {
@@ -11624,9 +11628,9 @@ var import_node_dns = require("node:dns");
 var import_node_util2 = require("node:util");
 var import_node_os = __toESM(require("node:os"), 1);
 var { Resolver: AsyncResolver } = import_node_dns.promises;
-var kCacheableLookupCreateConnection = Symbol("cacheableLookupCreateConnection");
-var kCacheableLookupInstance = Symbol("cacheableLookupInstance");
-var kExpires = Symbol("expires");
+var kCacheableLookupCreateConnection = /* @__PURE__ */ Symbol("cacheableLookupCreateConnection");
+var kCacheableLookupInstance = /* @__PURE__ */ Symbol("cacheableLookupInstance");
+var kExpires = /* @__PURE__ */ Symbol("expires");
 var supportsALL = typeof import_node_dns.ALL === "number";
 var verifyAgent = (agent) => {
   if (!(agent && typeof agent.createConnection === "function")) {
@@ -13480,7 +13484,7 @@ var Options = class _Options {
   toJSON() {
     return { ...this._internals };
   }
-  [Symbol.for("nodejs.util.inspect.custom")](_depth, options) {
+  [/* @__PURE__ */ Symbol.for("nodejs.util.inspect.custom")](_depth, options) {
     return (0, import_node_util3.inspect)(this._internals, options);
   }
   createNativeRequestOptions() {
@@ -14375,7 +14379,7 @@ var Request = class _Request extends import_node_stream3.Duplex {
   }
   _prepareCache(cache) {
     if (!cacheableStore.has(cache)) {
-      const cacheableRequest = new dist_default2((requestOptions, handler) => {
+      const cacheableRequest = new dist_default2(((requestOptions, handler) => {
         const result = requestOptions._request(requestOptions, handler);
         if (dist_default.promise(result)) {
           result.once = (event, handler2) => {
@@ -14402,7 +14406,7 @@ var Request = class _Request extends import_node_stream3.Duplex {
           };
         }
         return result;
-      }, cache);
+      }), cache);
       cacheableStore.set(cache, cacheableRequest.request());
     }
   }
@@ -14800,7 +14804,7 @@ var create = (defaults2) => {
     configurable: false,
     writable: false
   });
-  const got2 = (url, options, defaultOptions2 = defaults2.options) => {
+  const got2 = ((url, options, defaultOptions2 = defaults2.options) => {
     const request = new Request(url, options, defaultOptions2);
     let promise;
     const lastHandler = (normalized) => {
@@ -14837,7 +14841,7 @@ var create = (defaults2) => {
       return result;
     };
     return iterateHandlers(request.options);
-  };
+  });
   got2.extend = (...instancesOrOptions) => {
     const options = new Options(void 0, void 0, defaults2.options);
     const handlers = [...defaults2.handlers];
@@ -14861,7 +14865,7 @@ var create = (defaults2) => {
       mutableDefaults: Boolean(mutableDefaults)
     });
   };
-  const paginateEach = async function* (url, options) {
+  const paginateEach = (async function* (url, options) {
     let normalizedOptions = new Options(url, options, defaults2.options);
     normalizedOptions.resolveBodyOnly = false;
     const { pagination } = normalizedOptions;
@@ -14918,20 +14922,20 @@ var create = (defaults2) => {
       }
       numberOfRequests++;
     }
-  };
+  });
   got2.paginate = paginateEach;
-  got2.paginate.all = async (url, options) => {
+  got2.paginate.all = (async (url, options) => {
     const results = [];
     for await (const item of paginateEach(url, options)) {
       results.push(item);
     }
     return results;
-  };
+  });
   got2.paginate.each = paginateEach;
-  got2.stream = (url, options) => got2(url, { ...options, isStream: true });
+  got2.stream = ((url, options) => got2(url, { ...options, isStream: true }));
   for (const method of aliases) {
-    got2[method] = (url, options) => got2(url, { ...options, method });
-    got2.stream[method] = (url, options) => got2(url, { ...options, method, isStream: true });
+    got2[method] = ((url, options) => got2(url, { ...options, method }));
+    got2.stream[method] = ((url, options) => got2(url, { ...options, method, isStream: true }));
   }
   if (!defaults2.mutableDefaults) {
     Object.freeze(defaults2.handlers);
@@ -15059,7 +15063,7 @@ yargs_default(hideBin(process.argv)).command("db:backup", "backup database to th
   return yargs.positional("week", {
     describe: "week number"
   }).positional("topic", {
-    describe: "the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten",
+    describe: "the name of the data category, one of: fs, ves, kto, mss, wdims, gemeenten",
     default: "all"
   });
 }, async (argv) => {

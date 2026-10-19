@@ -80,7 +80,7 @@ yargs(hideBin(process.argv))
         describe: 'week number'
     })
         .positional('topic', {
-        describe: 'the name of the data category, one of: fs,ves,kto,mss,wdims,gemeenten',
+        describe: 'the name of the data category, one of: fs, ves, kto, mss, wdims, gemeenten',
         default: 'all'
     });
 }, async (argv) => {
