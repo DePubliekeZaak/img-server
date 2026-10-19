@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 # Deploy img-server to the droplet with rsync.
 #
-#   ./deploy.sh                  # build (node + cli) then rsync to img:/srv/img-server/
-#   ./deploy.sh --skip-build     # rsync only (use existing build artifacts)
+#   ./deploy.sh                  # rsync only (default — uses existing build artifacts)
+#   ./deploy.sh --build          # build (node + cli) first, then rsync to img:/srv/img-server/
 #   ./deploy.sh --delete         # mirror: remove files on the server that are gone from the repo
 #   ./deploy.sh --dry-run        # print what rsync/scp would do, change nothing
 #
 # WHAT IT DOES
-#   1. builds the parts that need compiling:
+#   1. (only with --build) builds the parts that need compiling:
 #        - node/ -> node/dist   (tsc; the importer Docker image is built from this on the server)
 #        - cli/  -> cli/img     (tsc + esbuild + pkg; needs `cd cli && npm install` once)
 #   2. rsyncs the repo to ${DEPLOY_HOST:-img}:/srv/img-server/
@@ -28,21 +28,21 @@ HOST="${DEPLOY_HOST:-img}"
 DEST="/srv/img-server"
 SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-SKIP_BUILD=0
+DO_BUILD=0
 MIRROR=""
 DRY_RUN=""
 
 for arg in "$@"; do
     case "$arg" in
-        --skip-build) SKIP_BUILD=1 ;;
+        --build)      DO_BUILD=1 ;;
         --delete)     MIRROR="--delete" ;;
         --dry-run)    DRY_RUN=1 ;;
         *) echo "unknown option: $arg" >&2; exit 1 ;;
     esac
 done
 
-# 1) builds
-if [ "$SKIP_BUILD" -eq 0 ]; then
+# 1) builds (only on request — default is to redeploy existing artifacts)
+if [ "${DO_BUILD:-0}" -eq 1 ]; then
     echo ">> building node -> node/dist"
     ( cd "$SRC/node" && npm run build )
     echo ">> building cli -> cli/img"
@@ -50,7 +50,7 @@ if [ "$SKIP_BUILD" -eq 0 ]; then
         && npx esbuild ./build/cli.js --bundle --outfile=img-cli.cjs --format=cjs --platform=node \
         && npx pkg img-cli.cjs --targets node16-linux-x64 --output img )
 else
-    echo ">> --skip-build: using existing build artifacts"
+    echo ">> no --build: using existing build artifacts"
 fi
 
 # 2) rsync the repo
