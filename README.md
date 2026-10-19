@@ -26,6 +26,10 @@ server keeps its own copies.
 
 Override the target host: `DEPLOY_HOST=user@host npm run deploy:nginx`
 
+Works with `pnpm` too (`pnpm run deploy:nginx`). The repo pins its own
+`pnpm-workspace.yaml` so pnpm treats this folder as its own workspace root
+instead of picking up any parent/global pnpm-workspace.yaml.
+
 ## nginx endpoints
 
 | path | omschrijving |

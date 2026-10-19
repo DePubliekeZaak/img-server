@@ -10,3 +10,6 @@ cli/node_modules
 node/dist/src/
 # personal VS Code workspace
 node/src/*.code-workspace
+
+# root package manager artifacts
+node_modules/
