@@ -1,0 +1,12 @@
+{
+  "name": "img-server",
+  "version": "2.0.0",
+  "private": true,
+  "description": "img-server monorepo: host nginx config, docker stack, node importer, cli",
+  "scripts": {
+    "deploy": "npm run deploy:node && npm run deploy:docker && npm run deploy:nginx",
+    "deploy:nginx": "bash deploy/nginx.sh",
+    "deploy:docker": "bash deploy/docker.sh",
+    "deploy:node": "bash deploy/node.sh"
+  }
+}
