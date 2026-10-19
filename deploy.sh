@@ -23,6 +23,15 @@
 #   - nginx changes:  sudo /srv/img-server/nginx/setup.sh
 #   - docker changes: cd /srv/img-server/docker && sudo docker compose up -d
 set -euo pipefail
+set -E
+
+# On any failure, say WHERE and WHY instead of dying without a trace.
+trap 'rc=$?
+    echo "" >&2
+    echo "!! deploy.sh failed (exit $rc) at line ${BASH_LINENO[0]}" >&2
+    echo "   command: $BASH_COMMAND" >&2
+    echo "   hint: if this is the rsync step, check \"ssh img\" works and DEPLOY_HOST is reachable" >&2
+    exit $rc' ERR
 
 HOST="${DEPLOY_HOST:-img}"
 DEST="/srv/img-server"
