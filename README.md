@@ -12,17 +12,19 @@ Monorepo for the IMG (schadedoormijnbouw) backend, deployed to the `img` droplet
 
 ## deploy
 
-One command per layer:
+Just moves the files to the server — no build, no server-side commands:
 
 ```sh
-npm run deploy:nginx    # rsync nginx/ to server + sudo nginx/setup.sh (installs + reloads)
-npm run deploy:docker   # rsync docker/ to server + docker compose up -d
-npm run deploy:node     # build node/dist, rsync node/, rebuild + restart importer
-npm run deploy          # all three, in order: node -> docker -> nginx
+npm run deploy:nginx    # rsync nginx/ -> img:/srv/img-server/nginx/
+npm run deploy:docker   # rsync docker/ -> img:/srv/img-server/docker/
+npm run deploy:node     # rsync node/ -> img:/srv/img-server/node/
+npm run deploy          # all three
 ```
 
-Secrets on the server (`docker/.env`, `node/.env`) are never synced — the
-server keeps its own copies.
+Server-side secrets (`docker/.env`, `node/.env`) are never synced.
+
+Anything that needs to *apply* the change still runs on the server, by hand:
+`sudo /srv/img-server/nginx/setup.sh` for nginx, `cd /srv/img-server/docker && sudo docker compose up -d` for the stack.
 
 Override the target host: `DEPLOY_HOST=user@host npm run deploy:nginx`
 
